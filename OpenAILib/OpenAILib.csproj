@@ -4,6 +4,7 @@
     <TargetFramework>net6.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <RepositoryUrl>https://github.com/osigurdson/OpenAILib</RepositoryUrl>
   </PropertyGroup>
 
 </Project>

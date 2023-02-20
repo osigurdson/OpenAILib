@@ -4,7 +4,26 @@
     <TargetFramework>net6.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <RepositoryUrl>https://github.com/osigurdson/OpenAILib</RepositoryUrl>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <Version>1.0.2</Version>
+    <Description>Simple OpenAI client library with no dependencies.</Description>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <Title>OpenAILib</Title>
+    <PackageProjectUrl>https://github.com/osigurdson/OpenAILib</PackageProjectUrl>
+    <Copyright></Copyright>
+    <PackageTags>OpenAI;Library;Embeddings;Completions;Simple</PackageTags>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\README.md">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+  </ItemGroup>
 
 </Project>

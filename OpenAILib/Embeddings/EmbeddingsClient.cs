@@ -40,7 +40,8 @@ namespace OpenAILib.Embeddings
             var responseText = await response.Content.ReadAsStringAsync();
             var embeddingResponse = JsonSerializer.Deserialize<EmbeddingResponse>(responseText);
             
-            if (embeddingResponse == null || embeddingResponse.Data == null || embeddingResponse.Data.Count != 1)
+            if (embeddingResponse == null || embeddingResponse.Data == null || 
+                embeddingResponse.Data.Count != 1 || embeddingResponse.Data[0].Embedding == null)
             {
                 throw new OpenAIException($"Failed to deserialize embedding response '{responseText}'.");
             }

@@ -21,6 +21,7 @@ namespace OpenAILibTest
         {
             var client = new OpenAIClient(OrganizationId, ApiKey);
             var completion = await client.GetCompletionAsync("1+1=");
+            Assert.IsTrue(completion.Contains("2"));
         }
     }
 }

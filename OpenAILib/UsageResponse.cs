@@ -4,7 +4,7 @@ using System.Text.Json.Serialization;
 
 namespace OpenAILib
 {
-    public class UsageResponse
+    internal class UsageResponse
     {
         [JsonPropertyName("prompt_tokens")]
         public int PromptTokens { get; set; }

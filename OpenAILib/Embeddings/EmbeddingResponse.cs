@@ -10,7 +10,7 @@ namespace OpenAILib.Embeddings
         public string? Object { get; set; }
 
         [JsonPropertyName("data")]
-        public List<EmbeddingDetail> Data { get; set; }
+        public List<EmbeddingDetail>? Data { get; set; }
 
         [JsonPropertyName("model")]
         public string? Model { get; set; }

@@ -1,4 +1,5 @@
-using OpenAILib;
+﻿using OpenAILib;
+using OpenAILib.ResponseCaching;
 
 namespace OpenAILibTest
 {
@@ -11,17 +12,14 @@ namespace OpenAILibTest
         [TestMethod]
         public async Task TestGetEmbeddingAsync()
         {
-            var client = new OpenAIClient(OrganizationId, ApiKey);
+            var client = new OpenAIClient(
+                new OpenAIClientArgs(organizationId: OrganizationId, apiKey: ApiKey)
+                {
+                    ResponseCache = new TempFileResponseCache()
+                });
+
             var vector = await client.GetEmbeddingAsync("my text to embed");
             Assert.AreEqual(1536, vector.Length);
-        }
-
-        [TestMethod]
-        public async Task TestGetCompletionAsync()
-        {
-            var client = new OpenAIClient(OrganizationId, ApiKey);
-            var completion = await client.GetCompletionAsync("1+1=");
-            Assert.IsTrue(completion.Contains("2"));
         }
     }
 }

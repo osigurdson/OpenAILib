@@ -1,4 +1,5 @@
-﻿// MIT License
+﻿// Copyright (c) 2023 Owen Sigurdson
+// MIT License
 
 namespace OpenAILib
 {

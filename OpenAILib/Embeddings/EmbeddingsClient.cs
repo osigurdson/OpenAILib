@@ -1,5 +1,7 @@
-﻿// MIT License
+﻿// Copyright (c) 2023 Owen Sigurdson
+// MIT License
 
+using OpenAILib.ResponseCaching;
 using System.Net.Http.Json;
 using System.Text.Json;
 
@@ -7,11 +9,14 @@ namespace OpenAILib.Embeddings
 {
     internal class EmbeddingsClient
     {
+        private const string EndPointName = "embeddings";
         private readonly HttpClient _httpClient;
+        private readonly IResponseCache _responseCache;
 
-        public EmbeddingsClient(HttpClient httpClient)
+        public EmbeddingsClient(HttpClient httpClient, IResponseCache responseCache)
         {
             _httpClient = httpClient;
+            _responseCache = responseCache;
         }
 
         /// <summary>
@@ -34,18 +39,36 @@ namespace OpenAILib.Embeddings
             };
 
             var content = JsonContent.Create(request);
-            var response = await _httpClient.PostAsync("embeddings", content);
-            response.EnsureSuccessStatusCode();
 
-            var responseText = await response.Content.ReadAsStringAsync();
+            var requestHash = RequestHashCalculator.CalculateHash(EndPointName, await content.ReadAsStringAsync());
+            if (!_responseCache.TryGetResponseAsync(requestHash, out var responseText))
+            {
+                var response = await _httpClient.PostAsync(EndPointName, content);
+                response.EnsureSuccessStatusCode();
+                responseText = await response.Content.ReadAsStringAsync();
+                _responseCache.PutResponse(requestHash, responseText);
+            }
+
+            if (string.IsNullOrEmpty(responseText))
+            {
+                throw new ArgumentException($"No result returned for embedding text: '{text}'");
+            }
+
             var embeddingResponse = JsonSerializer.Deserialize<EmbeddingResponse>(responseText);
             
-            if (embeddingResponse == null || embeddingResponse.Data == null || 
-                embeddingResponse.Data.Count != 1 || embeddingResponse.Data[0].Embedding == null)
+            if (embeddingResponse == null ||
+                embeddingResponse.Data == null || 
+                embeddingResponse.Data.Count != 1)
             {
                 throw new OpenAIException($"Failed to deserialize embedding response '{responseText}'.");
             }
-            return embeddingResponse.Data[0].Embedding;
+
+            var embeddingText = embeddingResponse.Data[0].Embedding;
+            if (embeddingText == null)
+            {
+                throw new OpenAIException($"Failed to deserialize embedding response '{responseText}'.");
+            }
+            return embeddingText;
         }
     }
 }

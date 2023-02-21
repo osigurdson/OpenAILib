@@ -1,17 +1,23 @@
-﻿// MIT License
+﻿// Copyright (c) 2023 Owen Sigurdson
+// MIT License
 
+using OpenAILib.ResponseCaching;
 using System.Net.Http.Json;
+using System.Runtime.CompilerServices;
 using System.Text.Json;
 
 namespace OpenAILib.Completions
 {
     internal class CompletionsClient
     {
+        private const string EndPointName = "completions";
         private readonly HttpClient _httpClient;
+        private readonly IResponseCache _responseCache;
 
-        public CompletionsClient(HttpClient httpClient)
+        public CompletionsClient(HttpClient httpClient, IResponseCache responseCache)
         {
             _httpClient = httpClient;
+            _responseCache = responseCache;
         }
 
         /// <summary>
@@ -31,9 +37,21 @@ namespace OpenAILib.Completions
             };
 
             var content = JsonContent.Create(request);
-            var response = await _httpClient.PostAsync("completions", content);
-            response.EnsureSuccessStatusCode();
-            var responseText = await response.Content.ReadAsStringAsync();
+
+            var requestHash = RequestHashCalculator.CalculateHash(EndPointName, await content.ReadAsStringAsync());
+            if (!_responseCache.TryGetResponseAsync(requestHash, out var responseText))
+            {
+                var response = await _httpClient.PostAsync(EndPointName, content);
+                response.EnsureSuccessStatusCode();
+                responseText = await response.Content.ReadAsStringAsync();
+                _responseCache.PutResponse(requestHash, responseText);
+            }
+
+            if (string.IsNullOrEmpty(responseText))
+            {
+                throw new ArgumentException($"No result returned for prompt: '{prompt}'");
+            }
+
             var completionResponse = JsonSerializer.Deserialize<CompletionResponse>(responseText);
 
             if (completionResponse == null || 

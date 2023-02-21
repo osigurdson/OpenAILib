@@ -1,4 +1,6 @@
-﻿// MIT License
+﻿// Copyright (c) 2023 Owen Sigurdson
+// MIT License
+
 using System.Text.Json.Serialization;
 
 namespace OpenAILib.Completions

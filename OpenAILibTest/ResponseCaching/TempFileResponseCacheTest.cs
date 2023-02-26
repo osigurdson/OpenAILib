@@ -1,6 +1,9 @@
-﻿using OpenAILib.ResponseCaching;
+﻿// Copyright (c) 2023 Owen Sigurdson
+// MIT License
 
-namespace OpenAILibTest.ResponseCaching
+using OpenAILib.ResponseCaching;
+
+namespace OpenAILib.Tests.ResponseCaching
 {
     [TestClass]
     public class TempFileResponseCacheTest

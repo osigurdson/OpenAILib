@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
@@ -9,7 +9,7 @@
     <RepositoryUrl>https://github.com/osigurdson/OpenAILib</RepositoryUrl>
     <IncludeSymbols>true</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-    <Version>1.0.2</Version>
+    <Version>1.0.3</Version>
     <Description>Simple OpenAI client library with no dependencies.</Description>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <Title>OpenAILib</Title>
@@ -24,6 +24,12 @@
       <Pack>True</Pack>
       <PackagePath>\</PackagePath>
     </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
+      <_Parameter1>$(AssemblyName).Tests</_Parameter1>
+    </AssemblyAttribute>
   </ItemGroup>
 
 </Project>

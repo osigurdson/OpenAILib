@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.4.33122.133
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenAILib", "OpenAILib\OpenAILib.csproj", "{82B37987-4457-46E7-BAFF-9EDB4EE3E8E4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenAILib", "OpenAILib\OpenAILib.csproj", "{82B37987-4457-46E7-BAFF-9EDB4EE3E8E4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenAILibTest", "OpenAILibTest\OpenAILibTest.csproj", "{4A2738BF-D805-49EB-836B-BF566809EB50}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenAILib.Tests", "OpenAILibTest\OpenAILib.Tests.csproj", "{4A2738BF-D805-49EB-836B-BF566809EB50}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

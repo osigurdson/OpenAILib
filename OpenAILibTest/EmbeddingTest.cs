@@ -1,19 +1,18 @@
-﻿using OpenAILib;
+﻿// Copyright (c) 2023 Owen Sigurdson
+// MIT License
+
 using OpenAILib.ResponseCaching;
 
-namespace OpenAILibTest
+namespace OpenAILib.Tests
 {
     [TestClass]
     public class EmbeddingTest
     {
-        private static readonly string? ApiKey = Environment.GetEnvironmentVariable("OpenAI-Apikey");
-        private static readonly string? OrganizationId = Environment.GetEnvironmentVariable("OpenAI-OrganizationId");
-
         [TestMethod]
         public async Task TestGetEmbeddingAsync()
         {
             var client = new OpenAIClient(
-                new OpenAIClientArgs(organizationId: OrganizationId, apiKey: ApiKey)
+                new OpenAIClientArgs(organizationId: TestCredentials.OrganizationId, apiKey: TestCredentials.ApiKey)
                 {
                     ResponseCache = new TempFileResponseCache()
                 });

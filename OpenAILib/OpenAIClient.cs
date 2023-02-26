@@ -3,11 +3,10 @@
 
 using OpenAILib.Completions;
 using OpenAILib.Embeddings;
-using System.Net.Http.Headers;
+using System.Net.Http;
 
 namespace OpenAILib
 {
-
     public class OpenAIClient
     {
         private readonly HttpClient _httpClient;
@@ -30,20 +29,7 @@ namespace OpenAILib
 
         public OpenAIClient(OpenAIClientArgs args)
         {
-            var uri = new Uri(args.Url);
-            _httpClient = new HttpClient
-            {
-                BaseAddress = uri
-            };
-
-            _httpClient
-                .DefaultRequestHeaders
-                .Authorization = new AuthenticationHeaderValue("Bearer", args.ApiKey);
-
-            _httpClient
-                .DefaultRequestHeaders
-                .Add("OpenAI-Organization", args.OrganizationId);
-
+            _httpClient = OpenAIHttpClient.CreateHttpClient(args);
             _completionsClient = new CompletionsClient(_httpClient, args.ResponseCache);
             _embeddingsClient = new EmbeddingsClient(_httpClient, args.ResponseCache);
         }

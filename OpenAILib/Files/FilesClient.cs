@@ -20,7 +20,7 @@ namespace OpenAILib.Files
             _httpClient = httpClient;
         }
 
-        public async Task<string> UploadStreamAsync(Stream stream, string purpose, string fileName)
+        public async Task<string> UploadStreamAsync(Stream stream, FilePurpose purpose, string fileName)
         {
             // See https://platform.openai.com/docs/api-reference/files/upload for details
             // The file content and file 'purpose' are required. At the time of writing only
@@ -28,18 +28,18 @@ namespace OpenAILib.Files
             var streamContent = new StreamContent(stream);
             var form = new MultipartFormDataContent
             {
-                { new StringContent(purpose), "purpose" },
+                { new StringContent(purpose.ToString()), "purpose" },
                 { streamContent, "file", fileName }
             };
 
             using var httpResponse = await _httpClient.PostAsync(FilesEndPointName, form);
             httpResponse.EnsureSuccessStatusCode();
-            using var responseText = await httpResponse.Content.ReadAsStreamAsync();
-            var deserializedResponse = JsonSerializer.Deserialize<FileResponse>(responseText);
+            using var responseStream = await httpResponse.Content.ReadAsStreamAsync();
+            var deserializedResponse = JsonSerializer.Deserialize<FileResponse>(responseStream);
 
             if (deserializedResponse?.Id == null)
             {
-                throw new OpenAIException($"Failed to deserialize file upload response: '{responseText}'");
+                throw new OpenAIException($"Failed to deserialize file upload response for file name '{fileName}', purpose '{purpose}'.");
             }
 
             return deserializedResponse.Id;
@@ -60,23 +60,9 @@ namespace OpenAILib.Files
             return deserilizedResponse.Data.ToList();
         }
 
-        public async Task<bool> DeleteFileAsync(string fileId)
+        public async Task<bool> DeleteAsync(string fileId)
         {
-            using var httpResponse = await _httpClient.DeleteAsync($"{FilesEndPointName}/{fileId}");
-            if (httpResponse.StatusCode == System.Net.HttpStatusCode.NotFound)
-            {
-                return false;
-            }
-            httpResponse.EnsureSuccessStatusCode();
-            using var responseStream = await httpResponse.Content.ReadAsStreamAsync();
-            var response = JsonSerializer.Deserialize<DeletedFileResponse>(responseStream);
-            
-            if (response == null || !response.Deleted.HasValue)
-            {
-                throw new OpenAIException($"Failed to deserialize file deletion response.");
-            }
-            
-            return response.Deleted.Value;
+            return await _httpClient.OpenAIDeleteAsync(FilesEndPointName, fileId);
         }
 
         public async Task<FileResponse> GetFileInfoAsync(string fileId)
@@ -99,6 +85,42 @@ namespace OpenAILib.Files
             using var httpResponse = await _httpClient.GetAsync($"{FilesEndPointName}/{fileId}/content");
             httpResponse.EnsureSuccessStatusCode();
             return await httpResponse.Content.ReadAsByteArrayAsync();
+        }
+    }
+
+    internal struct FilePurpose
+    {
+        // This is an approach to allow for an extensible enum like structure without having to use reflection
+        // on enum attributes.
+        public static FilePurpose FineTune = new FilePurpose("fine-tune");
+
+        private readonly string _purposeText;
+
+
+        public FilePurpose(string purposeText)
+        {
+            _purposeText = purposeText;
+        }
+
+        public override bool Equals(object? obj)
+        {
+            if (obj == null || GetType() != obj.GetType())
+            {
+                return false;
+            }
+
+            FilePurpose other = (FilePurpose)obj;
+            return _purposeText == other._purposeText;
+        }
+
+        public override int GetHashCode()
+        {
+            return _purposeText.GetHashCode();
+        }
+
+        public override string ToString()
+        {
+            return _purposeText;
         }
     }
 }

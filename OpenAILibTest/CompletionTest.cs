@@ -1,6 +1,7 @@
 // Copyright (c) 2023 Owen Sigurdson
 // MIT License
 
+using OpenAILib.Completions;
 using OpenAILib.ResponseCaching;
 
 namespace OpenAILib.Tests

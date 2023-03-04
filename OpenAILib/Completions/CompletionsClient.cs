@@ -3,14 +3,13 @@
 
 using OpenAILib.ResponseCaching;
 using System.Net.Http.Json;
-using System.Runtime.CompilerServices;
 using System.Text.Json;
 
 namespace OpenAILib.Completions
 {
     internal class CompletionsClient
     {
-        private const string EndPointName = "completions";
+        private const string CompletionsEndpointName = "completions";
         private readonly HttpClient _httpClient;
         private readonly IResponseCache _responseCache;
 
@@ -18,6 +17,33 @@ namespace OpenAILib.Completions
         {
             _httpClient = httpClient;
             _responseCache = responseCache;
+        }
+
+        public async Task<CompletionResponse> GetCompletionAsync(CompletionRequest request)
+        {
+            var content = JsonContent.Create(request);
+
+            var requestHash = RequestHashCalculator.CalculateHash(CompletionsEndpointName, await content.ReadAsStringAsync());
+            if (!_responseCache.TryGetResponseAsync(requestHash, out var responseText))
+            {
+                var response = await _httpClient.PostAsync(CompletionsEndpointName, content);
+                response.EnsureSuccessStatusCode();
+                responseText = await response.Content.ReadAsStringAsync();
+                _responseCache.PutResponse(requestHash, responseText);
+            }
+
+            if (string.IsNullOrEmpty(responseText))
+            {
+                throw new ArgumentException($"No result returned for completion request.");
+            }
+
+            var completionResponse = JsonSerializer.Deserialize<CompletionResponse>(responseText);
+            if (completionResponse == null || completionResponse.Choices == null || completionResponse.Choices.Count < 1)
+            {
+                throw new OpenAIException("Failed to deserialize completion response");
+            }
+
+            return completionResponse;
         }
 
         /// <summary>
@@ -33,36 +59,18 @@ namespace OpenAILib.Completions
                 Model = "text-davinci-003",
                 Prompt = prompt,
                 Temperature = 0.7,
-                MaxTokens = 2048
+                MaxTokens = 2048,
             };
 
-            var content = JsonContent.Create(request);
-
-            var requestHash = RequestHashCalculator.CalculateHash(EndPointName, await content.ReadAsStringAsync());
-            if (!_responseCache.TryGetResponseAsync(requestHash, out var responseText))
+            var response = await GetCompletionAsync(request);
+            // TODO - refactor CompletionResponse to be non nullable
+            var responseText = response?.Choices?[0]?.Text;
+            if (responseText == null)
             {
-                var response = await _httpClient.PostAsync(EndPointName, content);
-                response.EnsureSuccessStatusCode();
-                responseText = await response.Content.ReadAsStringAsync();
-                _responseCache.PutResponse(requestHash, responseText);
+                throw new OpenAIException("Failed to deserialize completion response");
             }
+            return responseText;
 
-            if (string.IsNullOrEmpty(responseText))
-            {
-                throw new ArgumentException($"No result returned for prompt: '{prompt}'");
-            }
-
-            var completionResponse = JsonSerializer.Deserialize<CompletionResponse>(responseText);
-
-            if (completionResponse == null || 
-                completionResponse.Choices == null || 
-                completionResponse.Choices.Count != 1)
-            {
-                throw new OpenAIException($"Failed to deserialize completion response '{responseText}'.");
-            }
-
-            var resultText = completionResponse.Choices[0].Text ?? string.Empty;
-            return resultText;
         }
     }
 }

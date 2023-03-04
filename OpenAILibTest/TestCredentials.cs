@@ -10,10 +10,10 @@ namespace OpenAILib.Tests
         private const string ApiKeyEnvironmentVariableName = "OpenAI_ApiKey";
 
         private static readonly Lazy<string> OrganizationIdEnvironmentVariableLazy
-            = new Lazy<string>(() => GetEnvironmentVariable(OrganizationIdEnvironmentVariableName));
+            = new(() => GetEnvironmentVariable(OrganizationIdEnvironmentVariableName));
 
         private static readonly Lazy<string> ApiKeyEnvironmentVariableLazy
-            = new Lazy<string>(() => GetEnvironmentVariable(ApiKeyEnvironmentVariableName));
+            = new(() => GetEnvironmentVariable(ApiKeyEnvironmentVariableName));
 
         public static string OrganizationId => OrganizationIdEnvironmentVariableLazy.Value;
         public static string ApiKey => ApiKeyEnvironmentVariableLazy.Value;

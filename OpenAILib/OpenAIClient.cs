@@ -3,10 +3,10 @@
 
 using OpenAILib.Completions;
 using OpenAILib.Embeddings;
-using System.Net.Http;
 
 namespace OpenAILib
 {
+
     public class OpenAIClient
     {
         private readonly HttpClient _httpClient;

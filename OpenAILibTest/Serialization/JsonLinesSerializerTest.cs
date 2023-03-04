@@ -3,6 +3,8 @@
 
 using OpenAILib.FineTuning;
 using OpenAILib.Serialization;
+using OpenAILib.Tests.TestCorpora;
+using System.Text;
 
 namespace OpenAILib.Tests.Serialization
 {
@@ -15,8 +17,8 @@ namespace OpenAILib.Tests.Serialization
             // arrange
             var fineTuneSet = new List<FineTunePair>
             {
-                new FineTunePair { Prompt = "Zero", Completion = "0.0"},
-                new FineTunePair { Prompt = "One", Completion = "1.0"}
+                new (prompt : "Zero", completion : "0.0"),
+                new (prompt : "One", completion : "1.0")
             };
 
             // act
@@ -35,6 +37,21 @@ namespace OpenAILib.Tests.Serialization
                 Assert.AreEqual(fineTuneSet[i].Prompt, result[i].Prompt);
                 Assert.AreEqual(fineTuneSet[i].Completion, result[i].Completion);
             }
+        }
+
+        [TestMethod]
+        public void TestDeserializeText()
+        {
+            // arrange
+            var expectedPairs = SquadOxygen.Create();
+            var bytes = Encoding.UTF8.GetBytes(SquadOxygen.CreateText());
+            using var memoryStream = new MemoryStream(bytes);
+
+            // act
+            var actualPairs = JsonLinesSerializer.Deserialize<FineTunePair>(memoryStream).ToList();
+
+            // assert
+            CollectionAssert.AreEqual(expectedPairs.ToList(), actualPairs);
         }
     }
 }

@@ -77,7 +77,7 @@ namespace OpenAILib
             return await GetChatCompletionAsync(sequence, new ChatCompletionSpecV01());
         }
 
-        internal async Task<string> GetChatCompletionAsync(IEnumerable<ChatMessage> sequence, Action<IChatCompletionSpecV01> spec)
+        public async Task<string> GetChatCompletionAsync(IEnumerable<ChatMessage> sequence, Action<IChatCompletionSpecV01> spec)
         {
             var chatCompletionSpec = new ChatCompletionSpecV01();
             spec(chatCompletionSpec);

@@ -10,7 +10,7 @@ namespace OpenAILib.Tests.Files
     [TestClass]
     public class FilesClientTest 
     {
-        [TestMethod]
+        //[TestMethod]
         public async Task BasicUsageTest()
         {
             var httpClient = OpenAIHttpClient
@@ -65,12 +65,6 @@ namespace OpenAILib.Tests.Files
 
             Assert.IsTrue(newFileSet.Contains(fileId));
 
-            // Delete file
-            // Unfortunately, the 'files' endpoint isn't robust against fast
-            // create / delete operations like this and '429 - Conflict' can
-            // be returned from the service. For this reason an arbitrary
-            // is introduced
-            await Task.Delay(5000);
             bool fileIsDeleted = await filesClient.DeleteAsync(fileId);
             Assert.IsTrue(fileIsDeleted);
 

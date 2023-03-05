@@ -62,7 +62,7 @@ namespace OpenAILib.Files
 
         public async Task<bool> DeleteAsync(string fileId)
         {
-            return await _httpClient.OpenAIDeleteAsync(FilesEndPointName, fileId);
+            return await _httpClient.OpenAIDeleteAsync($"{FilesEndPointName}/{fileId}");
         }
 
         public async Task<FileResponse> GetFileInfoAsync(string fileId)

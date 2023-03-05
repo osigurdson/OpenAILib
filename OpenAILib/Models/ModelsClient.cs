@@ -3,6 +3,7 @@
 
 namespace OpenAILib.Models
 {
+
     internal class ModelsClient
     {
         private const string ModelsEndpointName = "models";
@@ -15,7 +16,7 @@ namespace OpenAILib.Models
 
         public async Task<bool> DeleteAsync(string model)
         {
-            return await _httpClient.OpenAIDeleteAsync(ModelsEndpointName, model);
+            return await _httpClient.OpenAIDeleteAsync($"{ModelsEndpointName}/{model}");
         }
 
 

@@ -64,10 +64,8 @@ namespace OpenAILib.Tests.FineTuning
             Console.WriteLine($"Our new model: '{fineTunedModel}'");
 
             // try to use it
-            var completionRequest = new CompletionRequest
+            var completionRequest = new CompletionRequest(model: fineTunedModel, prompt: "What is the boiling point of oxygen?")
             {
-                Model = fineTunedModel,
-                Prompt = "What is the boiling point of oxygen?",
                 MaxTokens = 100
             };
 

@@ -4,10 +4,12 @@
 using OpenAILib.Serialization;
 using System.Text.Json.Serialization;
 
-namespace OpenAILib.ChatCompletions
+// Note that this is deliberately placed in the OpenAILib base namespace so that
+// consumers of the API only require a single using statement
+namespace OpenAILib
 {
     [JsonConverter(typeof(JsonEnumMemberConverter<ChatRole>))]
-    internal enum ChatRole
+    public enum ChatRole
     {
         System,
         User,

@@ -45,32 +45,5 @@ namespace OpenAILib.Completions
 
             return completionResponse;
         }
-
-        /// <summary>
-        /// Returns a text completion for the given prompt using OpenAI's default model and settings.
-        /// </summary>
-        /// <param name="prompt">The text prompt to generate a completion for.</param>
-        /// <returns>The generated completion text as a string.</returns>
-        /// <exception cref="OpenAIException">Thrown if the completion request fails or the response cannot be deserialized.</exception>
-        public async Task<string> GetCompletionAsync(string prompt)
-        {
-            var request = new CompletionRequest
-            {
-                Model = "text-davinci-003",
-                Prompt = prompt,
-                Temperature = 0.7,
-                MaxTokens = 2048,
-            };
-
-            var response = await GetCompletionAsync(request);
-            // TODO - refactor CompletionResponse to be non nullable
-            var responseText = response?.Choices?[0]?.Text;
-            if (responseText == null)
-            {
-                throw new OpenAIException("Failed to deserialize completion response");
-            }
-            return responseText;
-
-        }
     }
 }

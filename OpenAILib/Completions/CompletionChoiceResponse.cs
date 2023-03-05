@@ -8,15 +8,24 @@ namespace OpenAILib.Completions
     internal class CompletionChoiceResponse
     {
         [JsonPropertyName("text")]
-        public string? Text { get; set; }
+        public string Text { get;}
 
         [JsonPropertyName("index")]
-        public int Index { get; set; }
+        public int Index { get;}
 
         [JsonPropertyName("logprobs")]
-        public Logprobs? Logprobs { get; set; }
+        public Logprobs? Logprobs { get;}
 
         [JsonPropertyName("finish_reason")]
-        public string? FinishReason { get; set; }
+        public string FinishReason { get;}
+
+        [JsonConstructor()]
+        public CompletionChoiceResponse(string text, int index, Logprobs logprobs, string finishReason)
+        {
+            Text = text;
+            Index = index;
+            Logprobs = logprobs;
+            FinishReason = finishReason;
+        }
     }
 }

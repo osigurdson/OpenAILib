@@ -30,10 +30,9 @@ namespace OpenAILib.ChatCompletions
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public bool? Stream { get; set; } = false;
 
-        // TODO - this can be a string or an array of strings
         [JsonPropertyName("stop")]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-        public string? Stop { get; set; }
+        public string[]? Stop { get; set; }
 
         [JsonPropertyName("max_tokens")]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]

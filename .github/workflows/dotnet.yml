@@ -28,5 +28,5 @@ jobs:
       run: dotnet test --no-build --verbosity normal
       env:
           OpenAI_OrganizationId : ${{ secrets.OPENAI_ORGANIZATIONID }}
-          OpenAI_ApiKey : $ {{ secrets.OPENAI_APIKEY }}
+          OpenAI_ApiKey : ${{ secrets.OPENAI_APIKEY }}
       

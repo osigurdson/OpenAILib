@@ -9,9 +9,6 @@ on:
   pull_request:
     branches: [ "master" ]
 
-env:
-  ENV_NAME: Test
-
 jobs:
   build:
 
@@ -28,4 +25,7 @@ jobs:
     - name: Build
       run: dotnet build --no-restore
     - name: Test
+      env:
+        OPENAI_ORGANIZATIONID : ${{ secrets.OPENAI_ORGANIZATIONID }}
+        OPENAI_APIKEY : $ {{ secrets.OPENAI_APIKEY }}
       run: dotnet test --no-build --verbosity normal

@@ -17,7 +17,7 @@ var vector = await client.GetEmbeddingAsync("dog");
 ```
 
 ## ChatGPT Sequences
-Create your own command line chat bot using the ChatGPT model (using the default ''gpt-3.5-turbo' model). As described in the OpenAI API documentation, typically a conversation is formatted with a system message first, followed by alternating user and assistant messages. The initial 'System' message helps set behavior of the system. This is discussed in more detail at https://platform.openai.com/docs/guides/chat/introduction
+Create your own command line chat bot using the ChatGPT model (using the default 'gpt-3.5-turbo' model). As described in the OpenAI API documentation, typically a conversation is formatted with a system message first, followed by alternating user and assistant messages. The initial 'System' message helps set behavior of the system. This is discussed in more detail at https://platform.openai.com/docs/guides/chat/introduction
 
 ```csharp
 var sequence01 = new List<ChatMessage>

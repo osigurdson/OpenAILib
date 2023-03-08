@@ -24,7 +24,6 @@ namespace OpenAILib
                 .Add("OpenAI-Organization", args.OrganizationId);
 
             return httpClient;
-
         }
     }
 }

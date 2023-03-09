@@ -9,8 +9,8 @@
     <RepositoryUrl>https://github.com/osigurdson/OpenAILib</RepositoryUrl>
     <IncludeSymbols>true</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-    <Version>1.1.0</Version>
-    <Description>Simple OpenAI client library with no dependencies.</Description>
+    <Version>1.1.1</Version>
+    <Description>Simple OpenAI client library with no dependencies. Includes ChatGPT support.</Description>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <Title>OpenAILib</Title>
     <PackageProjectUrl>https://github.com/osigurdson/OpenAILib</PackageProjectUrl>

@@ -29,4 +29,10 @@ jobs:
       env:
           OpenAI_OrganizationId : ${{ secrets.OPENAI_ORGANIZATIONID }}
           OpenAI_ApiKey : ${{ secrets.OPENAI_APIKEY }}
+    - name: Publish if package version changes
+      uses: alirezanet/publish-nuget@v3.0.4
+      with:
+        PROJECT_FILE_PATH: OpenAILib/OpenAILib.csproj
+        NUGET_KEY: ${{secrets.NUGET_APIKEY}}
+      
       

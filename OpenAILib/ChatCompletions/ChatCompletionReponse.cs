@@ -17,13 +17,13 @@ namespace OpenAILib.ChatCompletions
         public int Created { get; set; }
 
         [JsonPropertyName("model")]
-        public string Model { get;}
+        public string Model { get; }
 
         [JsonPropertyName("usage")]
         public UsageResponse Usage { get; }
 
         [JsonPropertyName("choices")]
-        public List<ChatCompletionChoice> Choices { get;}
+        public List<ChatCompletionChoice> Choices { get; }
 
         [JsonConstructor]
         public ChatCompletionResponse(string id, string objectType, int created, string model, UsageResponse usage, List<ChatCompletionChoice> choices)

@@ -3,7 +3,7 @@
 
 using System.Net.Http.Headers;
 
-namespace OpenAILib
+namespace OpenAILib.HttpHandling
 {
     internal static class OpenAIHttpClient
     {

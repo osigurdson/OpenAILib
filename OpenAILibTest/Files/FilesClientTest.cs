@@ -3,6 +3,7 @@
 
 using OpenAILib.Files;
 using OpenAILib.FineTuning;
+using OpenAILib.HttpHandling;
 using OpenAILib.Serialization;
 
 namespace OpenAILib.Tests.Files

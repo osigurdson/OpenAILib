@@ -7,7 +7,7 @@ using System.Net;
 using System.Net.Http.Json;
 using System.Text.Json;
 
-namespace OpenAILib
+namespace OpenAILib.HttpHandling
 {
     /// <summary>
     /// Utility methods for common HttpClient operations

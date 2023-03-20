@@ -8,7 +8,7 @@ namespace OpenAILib.Completions
     internal class CompletionRequest
     {
         [JsonPropertyName("model")]
-        public string Model { get;}
+        public string Model { get; }
 
         [JsonPropertyName("prompt")]
         public string Prompt { get; }
@@ -38,7 +38,7 @@ namespace OpenAILib.Completions
 
         [JsonConstructor]
         public CompletionRequest(
-            string model, 
+            string model,
             string prompt)
         {
             Model = model;

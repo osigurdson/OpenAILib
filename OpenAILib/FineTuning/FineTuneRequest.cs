@@ -20,7 +20,7 @@ namespace OpenAILib.FineTuning
 
         [JsonPropertyName("n_epocs")]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-        public int? Epochs { get; set; }
+        public int? NEpochs { get; set; }
 
         [JsonPropertyName("batch_size")]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
@@ -36,7 +36,7 @@ namespace OpenAILib.FineTuning
 
         [JsonPropertyName("compute_classification_metrics")]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-        public double? ComputeClassificationMetrics { get; set; }
+        public bool? ComputeClassificationMetrics { get; set; }
 
         [JsonPropertyName("classification_n_classes")]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
@@ -53,7 +53,7 @@ namespace OpenAILib.FineTuning
         [JsonPropertyName("suffix")]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public string? Suffix { get; set; }
-        
+
         public FineTuneRequest(string trainingFile)
         {
             TrainingFile = trainingFile;

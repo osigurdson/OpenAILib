@@ -14,7 +14,7 @@ namespace OpenAILib.Completions
         public string Object { get; }
 
         [JsonPropertyName("created")]
-        public long Created { get;}
+        public long Created { get; }
 
         [JsonPropertyName("model")]
         public string Model { get; }

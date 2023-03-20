@@ -1,6 +1,8 @@
 ﻿// Copyright (c) 2023 Owen Sigurdson
 // MIT License
 
+using OpenAILib.HttpHandling;
+
 namespace OpenAILib.Models
 {
 

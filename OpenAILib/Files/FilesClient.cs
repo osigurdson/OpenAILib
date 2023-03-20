@@ -2,6 +2,7 @@
 // MIT License
 
 using System.Text.Json;
+using OpenAILib.HttpHandling;
 
 namespace OpenAILib.Files
 {
@@ -51,7 +52,7 @@ namespace OpenAILib.Files
             httpResponse.EnsureSuccessStatusCode();
             using var responseStream = await httpResponse.Content.ReadAsStreamAsync();
             var deserilizedResponse = JsonSerializer.Deserialize<FileListResponse>(responseStream);
-            
+
             if (deserilizedResponse?.Data == null)
             {
                 throw new OpenAIException($"Failed to deserialize file information response.");
@@ -71,12 +72,12 @@ namespace OpenAILib.Files
             httpResponse.EnsureSuccessStatusCode();
             using var responseStream = await httpResponse.Content.ReadAsStreamAsync();
             var response = JsonSerializer.Deserialize<FileResponse>(responseStream);
-            
+
             if (response == null)
             {
                 throw new OpenAIException($"Failed to deserialize file deletion response.");
             }
-            
+
             return response;
         }
 

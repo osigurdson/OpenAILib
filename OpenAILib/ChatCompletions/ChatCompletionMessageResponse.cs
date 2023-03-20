@@ -11,7 +11,7 @@ namespace OpenAILib.ChatCompletions
         public ChatRole Role { get; }
 
         [JsonPropertyName("content")]
-        public string Content { get;}
+        public string Content { get; }
 
         [JsonConstructor]
         public ChatCompletionMessageResponse(ChatRole role, string content)

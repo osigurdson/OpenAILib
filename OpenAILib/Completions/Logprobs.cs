@@ -8,7 +8,7 @@ namespace OpenAILib.Completions
     internal class Logprobs
     {
         [JsonPropertyName("tokens")]
-        public List<string> Tokens { get;}
+        public List<string> Tokens { get; }
 
         [JsonPropertyName("token_logprobs")]
         public List<double> TokenLogProbs { get; }
@@ -17,7 +17,7 @@ namespace OpenAILib.Completions
         public IList<IDictionary<string, double>> TopLogProbs { get; }
 
         [JsonPropertyName("text_offset")]
-        public List<int> TextOffsets { get;}
+        public List<int> TextOffsets { get; }
 
         [JsonConstructor]
         public Logprobs(List<string> tokens, List<double> tokenLogProbs, List<IDictionary<string, double>> topLogProbs, List<int> textOffsets)

@@ -9,10 +9,10 @@ namespace OpenAILib.ChatCompletions
     internal class ChatCompletionRequest
     {
         [JsonPropertyName("model")]
-        public string Model { get;}
+        public string Model { get; }
 
         [JsonPropertyName("messages")]
-        public List<ChatMessageRequest> Messages { get;}
+        public List<ChatMessageRequest> Messages { get; }
 
         [JsonPropertyName("temperature")]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]

@@ -1,4 +1,5 @@
 ﻿
+using OpenAILib.HttpHandling;
 using OpenAILib.ResponseCaching;
 
 namespace OpenAILib.ChatCompletions

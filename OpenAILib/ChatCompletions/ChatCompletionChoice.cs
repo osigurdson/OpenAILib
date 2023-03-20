@@ -14,7 +14,7 @@ namespace OpenAILib.ChatCompletions
         public string FinishReason { get; }
 
         [JsonPropertyName("index")]
-        public int Index { get;  }
+        public int Index { get; }
 
         [JsonConstructor]
         public ChatCompletionChoice(ChatCompletionMessageResponse message, string finishReason, int index)

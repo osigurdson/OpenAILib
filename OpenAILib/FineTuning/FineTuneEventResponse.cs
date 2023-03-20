@@ -8,15 +8,24 @@ namespace OpenAILib.FineTuning
     internal class FineTuneEventResponse
     {
         [JsonPropertyName("object")]
-        public string? Object { get; set; }
+        public string Object { get; }
 
         [JsonPropertyName("created_at")]
-        public long CreatedAt { get; set; }
+        public long CreatedAt { get; }
 
         [JsonPropertyName("level")]
-        public string? Level { get; set; }
+        public string Level { get; }
 
         [JsonPropertyName("message")]
-        public string? Message { get; set; }
+        public string Message { get; }
+
+        [JsonConstructor]
+        public FineTuneEventResponse(string @object, long createdAt, string level, string message)
+        {
+            Object = @object;
+            CreatedAt = createdAt;
+            Level = level;
+            Message = message;
+        }
     }
 }

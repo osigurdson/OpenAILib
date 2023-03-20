@@ -4,6 +4,7 @@
 using OpenAILib.ChatCompletions;
 using OpenAILib.Completions;
 using OpenAILib.Embeddings;
+using OpenAILib.HttpHandling;
 
 namespace OpenAILib
 {

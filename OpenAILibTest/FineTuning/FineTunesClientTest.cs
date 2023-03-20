@@ -11,7 +11,6 @@ using OpenAILib.Serialization;
 namespace OpenAILib.Tests.FineTuning
 {
     [TestClass]
-
     public class FineTunesClientTest
     {
         [TestMethod]

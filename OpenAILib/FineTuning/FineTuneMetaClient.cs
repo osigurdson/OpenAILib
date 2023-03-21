@@ -22,19 +22,19 @@ namespace OpenAILib.FineTuning
             _filesClient = new FilesClient(httpClient);
         }
 
-        public async Task<FineTuneInfo> CreateFineTuneAsync(List<FineTunePair> trainingData)
+        public async Task<FineTuneInfo> CreateFineTuneAsync(List<FineTunePair> trainingData, CancellationToken cancellationToken = default)
         {
-            return await CreateFineTuneAsync(trainingData, new FineTuneSpec01());
+            return await CreateFineTuneAsync(trainingData, new FineTuneSpec01(), cancellationToken);
         }
 
-        public async Task<FineTuneInfo> CreateFineTuneAsync(List<FineTunePair> trainingData, Action<IFineTuneSpec01> spec)
+        public async Task<FineTuneInfo> CreateFineTuneAsync(List<FineTunePair> trainingData, Action<IFineTuneSpec01> spec, CancellationToken cancellationToken = default)
         {
             var settings = new FineTuneSpec01();
             spec(settings);
-            return await CreateFineTuneAsync(trainingData, settings);
+            return await CreateFineTuneAsync(trainingData, settings, cancellationToken);
         }
 
-        internal async Task<(bool, string?)> TryGetFineTuneModelNameAsync(FineTuneInfo fineTune, CancellationToken token)
+        internal async Task<(bool, string?)> TryGetFineTuneModelNameAsync(FineTuneInfo fineTune, CancellationToken cancellationToken = default)
         {
             // Standard GetOrAdd method cannot be used with async responses. Code is a little clunkier
             // but the behavior is the same.
@@ -43,7 +43,7 @@ namespace OpenAILib.FineTuning
                 return (true, s_fineTuneIdToModelNameMap[fineTune.FineTuneId]);
             }
 
-            var fineTuneResponse = await _fineTunesClient.GetFineTuneAsync(fineTune.FineTuneId);
+            var fineTuneResponse = await _fineTunesClient.GetFineTuneAsync(fineTune.FineTuneId, cancellationToken);
             var fineTunedModelName = fineTuneResponse.FineTunedModel;
             if (string.IsNullOrEmpty(fineTunedModelName))
             {
@@ -54,10 +54,9 @@ namespace OpenAILib.FineTuning
             
         }
 
-        // TODO - cancellation
-        public async Task<List<FineTuneEvent>> GetEventsAsync(FineTuneInfo fineTune)
+        public async Task<List<FineTuneEvent>> GetEventsAsync(FineTuneInfo fineTune, CancellationToken cancellationToken = default)
         {
-            var fineTuneResponse = await _fineTunesClient.GetFineTuneAsync(fineTune.FineTuneId);
+            var fineTuneResponse = await _fineTunesClient.GetFineTuneAsync(fineTune.FineTuneId, cancellationToken);
             var result = fineTuneResponse.Events
                 .Select(evt => FineTuneEvent.FromFineTuneResponse(evt))
                 .ToList();
@@ -77,10 +76,9 @@ namespace OpenAILib.FineTuning
             }
         }
 
-        // TODO - cancellation
-        public async Task<FineTuneStatus> GetStatusAsync(FineTuneInfo fineTune)
+        public async Task<FineTuneStatus> GetStatusAsync(FineTuneInfo fineTune, CancellationToken cancellationToken = default)
         {
-            var fineTuneResponse = await _fineTunesClient.GetFineTuneAsync(fineTune.FineTuneId);
+            var fineTuneResponse = await _fineTunesClient.GetFineTuneAsync(fineTune.FineTuneId, cancellationToken);
 
             // TODO: verify that these strings are what is actually returned
             switch (fineTuneResponse.Status)
@@ -95,29 +93,29 @@ namespace OpenAILib.FineTuning
             return FineTuneStatus.NotReady;
         }
 
-        private async Task<FineTuneInfo> CreateFineTuneAsync(List<FineTunePair> trainingData, FineTuneSpec01 settings)
+        private async Task<FineTuneInfo> CreateFineTuneAsync(List<FineTunePair> trainingData, FineTuneSpec01 settings, CancellationToken cancellationToken = default)
         {
             var promptSuffix = settings.GetPromptSuffix();
             var completionSuffix = settings.GetCompletionSuffix();
 
-            var lookup = await GetOpenAILibManagedFiles();
+            var lookup = await GetOpenAILibManagedFiles(cancellationToken);
             var processedTrainingData = FineTuneTrainingDataProcessor.ProcessFineTuneData(trainingData, promptSuffix, completionSuffix);
-            var trainingFileId = await EnsureTrainingDataUploadedAsync(processedTrainingData, lookup);
+            var trainingFileId = await EnsureTrainingDataUploadedAsync(processedTrainingData, lookup, cancellationToken);
 
             string? validationFileId = null;
             var validationData = settings.GetValidationData();
             if (validationData.Count > 0)
             {
                 var processedValidationData = FineTuneTrainingDataProcessor.ProcessFineTuneData(validationData, promptSuffix, completionSuffix);
-                validationFileId = await EnsureTrainingDataUploadedAsync(processedValidationData, lookup);
+                validationFileId = await EnsureTrainingDataUploadedAsync(processedValidationData, lookup, cancellationToken);
             }
 
             var fineTuneRequest = settings.ToRequest(trainingFileId, validationFileId);
-            var fineTuneId = await _fineTunesClient.CreateFineTuneAsync(fineTuneRequest);
+            var fineTuneId = await _fineTunesClient.CreateFineTuneAsync(fineTuneRequest, cancellationToken);
             return new FineTuneInfo(fineTuneId, promptSuffix, completionSuffix);
         }
 
-        private async Task<string> EnsureTrainingDataUploadedAsync(List<FineTunePair> trainingData, Dictionary<string, FileResponse> lookup)
+        private async Task<string> EnsureTrainingDataUploadedAsync(List<FineTunePair> trainingData, Dictionary<string, FileResponse> lookup, CancellationToken cancellationToken)
         {
             // provide allocation hint - assume at least 10 bytes per pair
             var memoryStream = new MemoryStream(trainingData.Count * 10);
@@ -131,15 +129,15 @@ namespace OpenAILib.FineTuning
             }
             else
             {
-                fileId = await _filesClient.UploadStreamAsync(memoryStream, FilePurpose.FineTune, fileName);
+                fileId = await _filesClient.UploadStreamAsync(memoryStream, FilePurpose.FineTune, fileName, cancellationToken);
             }
             return fileId;
         }
 
-        private async Task<Dictionary<string, FileResponse>> GetOpenAILibManagedFiles()
+        private async Task<Dictionary<string, FileResponse>> GetOpenAILibManagedFiles(CancellationToken cancellationToken)
         {
             // creates a lookup for all OpenAILib (i.e. this library) managed files
-            var allFiles = await _filesClient.GetFilesAsync();
+            var allFiles = await _filesClient.GetFilesAsync(cancellationToken);
             var lookup = allFiles.Where(file => file.Filename.StartsWith(OpenAILibFileMarker))
                 .ToDictionary(file => file.Filename, file => file);
             return lookup;

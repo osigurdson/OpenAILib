@@ -17,20 +17,20 @@ namespace OpenAILib.HttpHandling
         /// <summary>
         /// <see cref="HttpClient"/> extension which handles object deletion from various endpoints - creates endpoint specific exception if required
         /// </summary>
-        public static async Task<bool> OpenAIDeleteAsync(this HttpClient httpClient, string requestUri)
+        public static async Task<bool> OpenAIDeleteAsync(this HttpClient httpClient, string requestUri, CancellationToken cancellationToken = default)
         {
-            using var httpResponse = await RetryDeleteOnConflictAsync(httpClient, requestUri);
+            using var httpResponse = await RetryDeleteOnConflictAsync(httpClient, requestUri, cancellationToken);
             if (httpResponse.StatusCode == HttpStatusCode.NotFound)
             {
                 return false;
             }
             httpResponse.EnsureSuccessStatusCode();
-            using var responseStream = await httpResponse.Content.ReadAsStreamAsync();
+            using var responseStream = await httpResponse.Content.ReadAsStreamAsync(cancellationToken);
             var response = Deserialize<ObjectDeletedResponse>(responseStream, requestUri);
             return response.Deleted;
         }
 
-        private static async Task<HttpResponseMessage> RetryDeleteOnConflictAsync(HttpClient httpClient, string requestUri)
+        private static async Task<HttpResponseMessage> RetryDeleteOnConflictAsync(HttpClient httpClient, string requestUri, CancellationToken cancellationToken)
         {
             // Unfortunately, the 'files' endpoint isn't robust against fast
             // create / delete operations like this and '429 - Conflict' can
@@ -39,14 +39,14 @@ namespace OpenAILib.HttpHandling
             var stopwatch = Stopwatch.StartNew();
             while (stopwatch.Elapsed < TimeSpan.FromMinutes(2))
             {
-                var httpResponse = await httpClient.DeleteAsync(requestUri);
+                var httpResponse = await httpClient.DeleteAsync(requestUri, cancellationToken);
                 if (httpResponse.StatusCode != HttpStatusCode.Conflict)
                 {
                     return httpResponse;
                 }
                 // Since we are not returning the response, it is explicitly disposed here
                 httpResponse.Dispose();
-                await Task.Delay(5000);
+                await Task.Delay(5000, cancellationToken);
             }
 
             // After we timeout, we make a final call to delete and
@@ -55,12 +55,16 @@ namespace OpenAILib.HttpHandling
         }
 
 
-        public static async Task<TResponse> OpenAIPostAsync<TRequest, TResponse>(this HttpClient httpClient, string requestUri, TRequest request)
+        public static async Task<TResponse> OpenAIPostAsync<TRequest, TResponse>(
+            this HttpClient httpClient, 
+            string requestUri, 
+            TRequest request, 
+            CancellationToken cancellationToken = default)
         {
             var content = JsonContent.Create(request);
-            using var httpResponse = await httpClient.PostAsync(requestUri, content);
+            using var httpResponse = await httpClient.PostAsync(requestUri, content, cancellationToken);
             httpResponse.EnsureSuccessStatusCode();
-            var responseStream = await httpResponse.Content.ReadAsStreamAsync();
+            var responseStream = await httpResponse.Content.ReadAsStreamAsync(cancellationToken);
             var response = Deserialize<TResponse>(responseStream, requestUri);
             return response;
         }
@@ -69,15 +73,16 @@ namespace OpenAILib.HttpHandling
             this HttpClient httpClient,
             string requestUri,
             TRequest request,
-            IResponseCache responseCache)
+            IResponseCache responseCache,
+            CancellationToken cancellationToken = default)
         {
             var content = JsonContent.Create(request);
             var requestHash = RequestHashCalculator.CalculateHash(requestUri, await content.ReadAsStringAsync());
             if (!responseCache.TryGetResponseAsync(requestHash, out var responseText))
             {
-                var response = await httpClient.PostAsync(requestUri, content);
+                var response = await httpClient.PostAsync(requestUri, content, cancellationToken);
                 response.EnsureSuccessStatusCode();
-                responseText = await response.Content.ReadAsStringAsync();
+                responseText = await response.Content.ReadAsStringAsync(cancellationToken);
                 responseCache.PutResponse(requestHash, responseText);
             }
 

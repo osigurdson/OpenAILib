@@ -20,13 +20,12 @@ namespace OpenAILib.FineTuning
             _httpClient = httpClient;
         }
 
-        public async Task<string> CreateFineTuneAsync(FineTuneRequest request)
+        public async Task<string> CreateFineTuneAsync(FineTuneRequest request, CancellationToken cancellationToken = default)
         {
             var content = JsonContent.Create(request);
-            var httpResponse = await _httpClient.PostAsync(FineTunesEndpointName, content);
+            var httpResponse = await _httpClient.PostAsync(FineTunesEndpointName, content, cancellationToken);
             httpResponse.EnsureSuccessStatusCode();
-            var text = await httpResponse.Content.ReadAsStringAsync();
-            var responseStream = await httpResponse.Content.ReadAsStreamAsync();
+            var responseStream = await httpResponse.Content.ReadAsStreamAsync(cancellationToken);
             var response = JsonSerializer.Deserialize<FineTuneResponse>(responseStream);
 
             if (response == null || response.Id == null)
@@ -37,12 +36,11 @@ namespace OpenAILib.FineTuning
             return response.Id;
         }
 
-        public async Task<IReadOnlyList<FineTuneResponse>> GetFineTunesAsync()
+        public async Task<IReadOnlyList<FineTuneResponse>> GetFineTunesAsync(CancellationToken cancellationToken = default)
         {
-            var httpResponse = await _httpClient.GetAsync(FineTunesEndpointName);
+            var httpResponse = await _httpClient.GetAsync(FineTunesEndpointName, cancellationToken);
             httpResponse.EnsureSuccessStatusCode();
-            var responseStream = await httpResponse.Content.ReadAsStreamAsync();
-            var responseText = await httpResponse.Content.ReadAsStringAsync();
+            var responseStream = await httpResponse.Content.ReadAsStreamAsync(cancellationToken);
             var response = JsonSerializer.Deserialize<FineTuneListResponse>(responseStream);
             if (response == null || response.Data == null)
             {
@@ -52,9 +50,9 @@ namespace OpenAILib.FineTuning
             return response.Data;
         }
 
-        public async Task<FineTuneResponse> GetFineTuneAsync(string fineTuneId)
+        public async Task<FineTuneResponse> GetFineTuneAsync(string fineTuneId, CancellationToken cancellationToken = default)
         {
-            var httpResponse = await _httpClient.GetAsync($"{FineTunesEndpointName}/{fineTuneId}");
+            var httpResponse = await _httpClient.GetAsync($"{FineTunesEndpointName}/{fineTuneId}", cancellationToken);
             httpResponse.EnsureSuccessStatusCode();
             var response = await httpResponse.Content.ReadFromJsonAsync<FineTuneResponse>();
             if (response == null)

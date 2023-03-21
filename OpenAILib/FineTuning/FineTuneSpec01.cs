@@ -5,7 +5,7 @@ namespace OpenAILib.FineTuning
 {
     internal class FineTuneSpec01 : IFineTuneSpec01
     {
-        public const string DefaultPromptSuffix = "###\n\n\"";
+        public const string DefaultPromptSuffix = "\n\n###\n\n";
         public const string DefaultCompletionSuffix = "###";
 
         // Fine tune request related items - directly translated into the request
@@ -18,7 +18,7 @@ namespace OpenAILib.FineTuning
         private int? _classificationNClasses;
         private string? _classificationPositiveClass;
         private double[]? _classificationBetas;
-        private string? _suffix;
+        private string? _modelSuffix;
 
         // Suffixes and validation data handling
         private string _promptSuffix = DefaultPromptSuffix;
@@ -80,9 +80,9 @@ namespace OpenAILib.FineTuning
             return this;
         }
 
-        public IFineTuneSpec01 Suffix(string suffix)
+        public IFineTuneSpec01 ModelSuffix(string modelSuffix)
         {
-            _suffix = suffix;
+            _modelSuffix = modelSuffix;
             return this;
         }
 
@@ -118,7 +118,7 @@ namespace OpenAILib.FineTuning
                 ClassificationNClasses = _classificationNClasses,
                 ClassificationPositiveClass = _classificationPositiveClass,
                 ClassificationBetas = _classificationBetas,
-                Suffix = _suffix
+                Suffix = _modelSuffix
             };
             return request;
         }

@@ -171,14 +171,14 @@ namespace OpenAILib.Tests.FineTuning
         }
 
         [TestMethod]
-        public void TestSuffix()
+        public void TestModelSuffix()
         {
             const string expectedSuffix = "-v2";
             // arrange
             var settings = new FineTuneSpec01();
 
             // act
-            settings.Suffix(expectedSuffix);
+            settings.ModelSuffix(expectedSuffix);
             var request = settings.ToRequest("id", null);
 
             // assert

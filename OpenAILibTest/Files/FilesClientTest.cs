@@ -11,7 +11,7 @@ namespace OpenAILib.Tests.Files
     [TestClass]
     public class FilesClientTest 
     {
-        //[TestMethod]
+        [TestMethod]
         public async Task BasicUsageTest()
         {
             var httpClient = OpenAIHttpClient
@@ -72,30 +72,6 @@ namespace OpenAILib.Tests.Files
             // Deleting non-existent file does not throw an exception
             bool nonExistentFileNotDeleted = await filesClient.DeleteAsync(fileId);
             Assert.IsFalse(nonExistentFileNotDeleted);
-        }
-
-        // [TestMethod] - // Just a convenience to clean up all uploaded files
-        public async Task Cleanup()
-        {
-            
-            var httpClient = OpenAIHttpClient
-                .CreateHttpClient(
-                    new OpenAIClientArgs(
-                            organizationId: TestCredentials.OrganizationId,
-                            apiKey: TestCredentials.ApiKey));
-
-            var filesClient = new FilesClient(httpClient);
-            var fileIds = (await filesClient.GetFilesAsync())
-                .Select(file => file.Id);
-
-            foreach (var fileId in fileIds)
-            {
-                if (fileId == null)
-                {
-                    continue;
-                }
-                await filesClient.DeleteAsync(fileId);
-            }
         }
 
         private static Stream SerializeFineTuneSet(List<FineTunePair> fineTuneSet)

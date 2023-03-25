@@ -1,12 +1,9 @@
 ﻿// Copyright (c) 2023 Owen Sigurdson
 // MIT License
 
-using OpenAILib.Completions;
-using OpenAILib.Files;
 using OpenAILib.FineTuning;
-using OpenAILib.Models;
-using OpenAILib.ResponseCaching;
-using OpenAILib.Serialization;
+using OpenAILib.Tests.TestCorpora;
+using System.Diagnostics;
 
 namespace OpenAILib.Tests.FineTuning
 {
@@ -14,75 +11,71 @@ namespace OpenAILib.Tests.FineTuning
     public class FineTunesClientTest
     {
         [TestMethod]
-        [TestCategory("Integration")]
-        public async Task TestFineTuneBasicInteraction()
+        public async Task IntegrationTestBasicWalkThrough()
         {
             var httpClient = TestHttpClient.CreateHttpClient();
-            var filesClient = new FilesClient(httpClient);
-            var fineTuneClient = new FineTunesClient(httpClient);
-            var modelsClient = new ModelsClient(httpClient);
-            var completionsClient = new CompletionsClient(httpClient, new NullResponseCache());
 
-            // Create training fine tuning prompt / completion pairs
-            var trainingData = TestCorpora.SquadOxygen.Create();
-            using var ms = new MemoryStream();
-            JsonLinesSerializer.Serialize(ms, trainingData);
-            ms.Position = 0;
+            // test api as exposed on OpenAIClient
+            IFineTunesClient ftc = new FineTunesClient(httpClient);
 
-            // Upload to files endpoint
-            var userFileName = $"f{Guid.NewGuid()}";
-            var openaiFileId = await filesClient.UploadStreamAsync(ms, FilePurpose.FineTune, userFileName);
+            // Step 1 - create the training data
+            var trainingData = Fetch20.CreateHockeyBaseballBlogTitles();
 
-            // create fine tune request
-            var fineTuneRequest = new FineTuneRequest(openaiFileId);
-            var fineTuneId = await fineTuneClient.CreateFineTuneAsync(fineTuneRequest);
+            // Step 2 - create the fine tune (fineTune 'a')
+            var fineTuneA = await ftc.CreateFineTuneAsync(trainingData);
 
-
-            // wait for completion - this can take a very long time
-            // not super appropriate for a unit test but good to smoke check the entire process occasionally as 
-            // this is how people will end up using this in practice
-            string fineTunedModel;
-            while (true)
+            // Step 3 - listen to all events / wait for completion
+            var streamingEvents = new List<string>();
+            await foreach (var evt in ftc.GetEventStreamAsync(fineTuneA))
             {
-                Thread.Sleep(5000);
-                var fineTune = await fineTuneClient.GetFineTuneAsync(fineTuneId);
-                if (!string.IsNullOrEmpty(fineTune.FineTunedModel))
-                {
-                    fineTunedModel = fineTune.FineTunedModel;
-                    break;
-                }
-                var lastEvent = fineTune.Events.LastOrDefault();
-                if (lastEvent != null)
-                {
-                    Console.WriteLine(lastEvent.Message);
-                }
+                streamingEvents.Add(evt.Message);
             }
 
-            // our new model is ready
-            Assert.IsNotNull(fineTunedModel);
-            Console.WriteLine($"Our new model: '{fineTunedModel}'");
+            // Step 4a - verify status is successful
+            var fineTuneAStatus = await ftc.GetStatusAsync(fineTuneA);
+            Assert.AreEqual(FineTuneStatus.Succeeded, fineTuneAStatus);
 
-            // try to use it
-            var completionRequest = new CompletionRequest(model: fineTunedModel, prompt: "What is the boiling point of oxygen?")
+            // Step 4b - check direct event access is equivelent to streamed events
+            var events = await ftc.GetEventsAsync(fineTuneA);
+            CollectionAssert.AreEqual(streamingEvents, events.Select(evt => evt.Message).ToList());
+
+            // Step 5 - use new model
+            // arrange
+            var args = new OpenAIClientArgs(
+                organizationId: TestCredentials.OrganizationId,
+                apiKey: TestCredentials.ApiKey);
+
+            var client = new OpenAIClient(args);
+           
+            var modelAPrompt = $"nhl";
+            var modelACompletion = await client.GetCompletionAsync(modelAPrompt, spec => spec.Model(fineTuneA));
+            Debug.WriteLine(modelACompletion);
+            Assert.IsNotNull(modelACompletion);
+
+            StringAssert.Contains(modelACompletion, "hockey");
+
+            // Step 6a - create a variant using 'ada' instead (fineTune 'b')
+            const string expectedModelBSuffix = "model-b-must-be-lower-case";
+            var fineTuneB = await ftc.CreateFineTuneVariantAsync(fineTuneA, spec => spec
+                                                                            .Model(FineTuneBaseModels.Ada)
+                                                                            .ModelSuffix(expectedModelBSuffix));
+            await foreach (var evt in ftc.GetEventStreamAsync(fineTuneB))
             {
-                MaxTokens = 100
-            };
+                Debug.WriteLine(evt.Message);
+            }
+            var fineTuneBStatus = await ftc.GetStatusAsync(fineTuneB);
+            Assert.AreEqual(FineTuneStatus.Succeeded, fineTuneBStatus);
 
-            var customResponse = await completionsClient.GetCompletionAsync(completionRequest);
-            Assert.AreEqual(1, customResponse?.Choices?.Count);
-            var customResponseText = customResponse?.Choices?[0]?.Text;
+            // Step 7 - use variant model
+            var modelBPrompt = $"mlb";
+            var modelBCompletion = await client.GetCompletionAsync(modelBPrompt, spec => spec.Model(fineTuneB));
+            Debug.WriteLine(modelBCompletion);
+            Assert.IsNotNull(modelBCompletion);
+            StringAssert.Contains(modelBCompletion, "baseball");
 
-            Console.WriteLine(customResponseText);
-            Assert.IsNotNull(customResponseText);
-
-            // Now clean it up
-            Thread.Sleep(5000);
-
-            var modelIsDeleted = await modelsClient.DeleteAsync(fineTunedModel);
-            Assert.IsTrue(modelIsDeleted);
-
-            var fileIsDeleted = await filesClient.DeleteAsync(openaiFileId);
-            Assert.IsTrue(modelIsDeleted);
+            // Step 8 - delete the models
+            await ftc.DeleteFineTuneAsync(fineTuneA, false);
+            await ftc.DeleteFineTuneAsync(fineTuneB, true);
         }
     }
 }

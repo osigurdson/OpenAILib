@@ -3,7 +3,10 @@
 
 namespace OpenAILib.FineTuning
 {
-    internal interface IFineTuneSpec01
+    /// <summary>
+    /// Represents specifications associated with creating fine-tuned models
+    /// </summary>
+    public interface IFineTuneSpec01
     {
         /// <summary>
         /// Sets the name of the base model to fine-tune. Defaults to "curie".
@@ -51,9 +54,10 @@ namespace OpenAILib.FineTuning
         IFineTuneSpec01 ClassificationBetas(params double[] betas);
 
         /// <summary>
-        /// Sets a string of up to 40 characters that will be added to your fine-tuned model name. For example, a suffix of "custom-model-name" would produce a model name like ada:ft-your-org:custom-model-name-2022-02-15-04-21-04. Defaults to null.
+        /// Sets a string of up to 40 characters (must be lower case) that will be added to your fine-tuned model name. For example, a suffix of "custom-model-name" would produce a model name like ada:ft-your-org:custom-model-name-2022-02-15-04-21-04. Defaults to null.
         /// </summary>
-        IFineTuneSpec01 ModelSuffix(string suffix);
+        /// <remarks>OpenAI API converts the suffix to lowercase</remarks>
+        IFineTuneSpec01 ModelSuffix(string modelSuffix);
 
         /// <summary>
         /// If you provide validation data, the data is used to generate validation metrics periodically during fine-tuning. These metrics can 

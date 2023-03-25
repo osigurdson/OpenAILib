@@ -4,6 +4,7 @@
 using OpenAILib.ChatCompletions;
 using OpenAILib.Completions;
 using OpenAILib.Embeddings;
+using OpenAILib.FineTuning;
 using OpenAILib.HttpHandling;
 
 namespace OpenAILib
@@ -14,6 +15,7 @@ namespace OpenAILib
         private readonly EmbeddingsClient _embeddingsClient;
         private readonly ChatCompletionsClient _chatCompletionsClient;
         private readonly CompletionsClient _completionsClient;
+        private readonly FineTunesClient _fineTuningClient;
 
         /// <summary>
         /// Initializes a new instance of <see cref="OpenAIClient"/> with specified organization ID and api key credentials
@@ -35,6 +37,7 @@ namespace OpenAILib
             _embeddingsClient = new EmbeddingsClient(_httpClient, args.ResponseCache);
             _completionsClient = new CompletionsClient(_httpClient, args.ResponseCache);
             _chatCompletionsClient = new ChatCompletionsClient(_httpClient, args.ResponseCache);
+            _fineTuningClient = new FineTunesClient(_httpClient);
         }
 
         /// <summary>
@@ -68,9 +71,10 @@ namespace OpenAILib
             // apply any specifications
             spec(completionSpecOptions);
 
-            var completionRequest = completionSpecOptions.ToCompletionRequest(prompt);
+
+            var completionRequest = await completionSpecOptions.ToCompletionRequestAsync(prompt, _fineTuningClient);
             var response = await _completionsClient.GetCompletionAsync(completionRequest);
-            return response.Choices[0].Text;
+            return response.Choices[0].Text.Trim();
         }
 
         public async Task<string> GetChatCompletionAsync(IEnumerable<ChatMessage> sequence)
@@ -96,7 +100,6 @@ namespace OpenAILib
             return response.Choices[0].Message.Content;
         }
 
-
         /// <summary>
         /// Gets an embedding vector for the specified <paramref name="text"/>
         /// </summary>
@@ -106,5 +109,7 @@ namespace OpenAILib
         {
             return await _embeddingsClient.GetEmbeddingAsync(text);
         }
+
+        public IFineTunesClient FineTuning => _fineTuningClient;
     }
 }

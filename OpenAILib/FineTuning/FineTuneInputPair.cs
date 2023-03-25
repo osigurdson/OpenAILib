@@ -5,14 +5,28 @@ using System.Text.Json.Serialization;
 
 namespace OpenAILib.FineTuning
 {
-    internal class FineTunePair
+    /// <summary>
+    /// Represents a pair of a prompt and a completion used for fine-tuning
+    /// </summary>
+    public class FineTunePair
     {
+        /// <summary>
+        /// Gets the prompt used for fine-tuning.
+        /// </summary>
         [JsonPropertyName("prompt")]
         public string Prompt { get; init; }
 
+        /// <summary>
+        /// Gets the completion generated during fine-tuning.
+        /// </summary>
         [JsonPropertyName("completion")]
         public string Completion { get; init; }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="FineTunePair"/> class with the specified prompt and completion.
+        /// </summary>
+        /// <param name="prompt">The prompt used for fine-tuning.</param>
+        /// <param name="completion">The completion / ideal response used for fine-tuning.</param>
         [JsonConstructor]
         public FineTunePair(string prompt, string completion)
         {

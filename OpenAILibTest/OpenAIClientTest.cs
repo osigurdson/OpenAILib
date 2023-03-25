@@ -64,6 +64,7 @@ namespace OpenAILib.Tests
         }
 
         [TestMethod]
+        [Ignore("code models deprecated")]
         public async Task TestGetCompletionsExplainCodeSample()
         {
             var client = new OpenAIClient(new OpenAIClientArgs(organizationId: TestCredentials.OrganizationId, apiKey: TestCredentials.ApiKey));

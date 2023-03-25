@@ -1,6 +1,8 @@
 ﻿// Copyright (c) 2023 Owen Sigurdson
 // MIT License
 
+using OpenAILib.FineTuning;
+
 namespace OpenAILib
 {
     /// <summary>
@@ -12,6 +14,11 @@ namespace OpenAILib
         /// Completion model to use. This can be a stock Open AI completions model <see cref="CompletionModels"/> or a custom fine tuned model. Defaults to 'text-davinci-003'.
         /// </summary>
         ICompletionSpecV01 Model(string model);
+
+        /// <summary>
+        /// Fined tuned completion model to use. Automatically applies appropriate prompt suffix and stop information. <see cref="Stop(string[])"/> specification ignored with fine tuned models
+        /// </summary>
+        ICompletionSpecV01 Model(FineTuneInfo model);
 
         /// <summary>
         /// Value between 0.0 and 2.0 which controls the randomness of the output. Default value is 1.0. Not recommended in conjuction with <see cref="TopProbability(double)"/>.

@@ -7,7 +7,6 @@
 // of consumers
 namespace OpenAILib
 {
-
     /// <summary>
     /// Represents well known chat completion models - these cannot be used with standard completions
     /// </summary>

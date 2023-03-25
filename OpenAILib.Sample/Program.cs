@@ -15,11 +15,12 @@ var sequence01 = new List<ChatMessage>
 };
 
 Console.WriteLine("Ask any question. Type 'done' to exit.");
-while (true)
+Console.WriteLine();
+Console.Write("Me: ");
+string question;
+while ((question = Console.ReadLine()) != "done")
 {
-    Console.WriteLine();
-    Console.Write("Me: ");
-    var question = Console.ReadLine();
+
     if (string.IsNullOrEmpty(question))
     {
         continue;
@@ -33,6 +34,8 @@ while (true)
     Console.Write("ChatGPT: ");
     Console.WriteLine(response01);
     sequence01.Add(new ChatMessage(ChatRole.Assistant, response01));
+    Console.WriteLine();
+    Console.Write("Me: ");
 }
 
 // Customized ChatGPT - using 'spec' to increase temperature and reduce the
@@ -45,6 +48,21 @@ var sequence02 = new List<ChatMessage>
 
 var response02 = await client.GetChatCompletionAsync(sequence02, spec => spec.Temperature(2.0).MaxTokens(10));
 Console.WriteLine(response02);
+
+// Mood to color example using davinci model (as shown in playground - https://platform.openai.com/examples/default-mood-color)
+const string prompt = @"
+                The CSS code for a color like a blue sky at dusk:
+
+                background-color: #";
+
+var responseText = await client.GetCompletionAsync(prompt, spec => spec
+                                                            .Model(CompletionModels.TextDavinci0003)
+                                                            .Temperature(0)
+                                                            .MaxTokens(64)
+                                                            .TopProbability(1)
+                                                            .FrequencyPenalty(0)
+                                                            .PresencePenalty(0)
+                                                            .Stop(";"));
 
 // returns a high dimensional normalized vector representing the specified text
 var vector = await client.GetEmbeddingAsync("dog");

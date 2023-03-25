@@ -13,5 +13,6 @@ namespace OpenAILib
     public static class ChatCompletionModels
     {
         public const string Gpt35Turbo = "gpt-3.5-turbo";
+        public const string Gpt40 = "gpt-4";
     }
 }

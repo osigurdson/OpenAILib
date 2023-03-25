@@ -9,13 +9,13 @@
     <RepositoryUrl>https://github.com/osigurdson/OpenAILib</RepositoryUrl>
     <IncludeSymbols>true</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-    <Version>1.1.1</Version>
-    <Description>Simple OpenAI client library with no dependencies. Includes ChatGPT support.</Description>
+    <Version>2.0.0</Version>
+    <Description>Simple OpenAI completions and embeddings library with no dependencies. Supports ChatGPT versions 3.5 and 4. Streamlines fine-tuning workflows.</Description>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <Title>OpenAILib</Title>
     <PackageProjectUrl>https://github.com/osigurdson/OpenAILib</PackageProjectUrl>
     <Copyright>Copyright (c) Owen Sigurdson</Copyright>
-    <PackageTags>OpenAI;Library;Embeddings;Completions;Simple;ChatGPT</PackageTags>
+    <PackageTags>OpenAI;Library;Embeddings;Completions;Simple;ChatGPT;ChatGPT4; Fine-tuning; Dependency free</PackageTags>
     <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
 

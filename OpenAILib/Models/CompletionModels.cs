@@ -13,8 +13,5 @@ namespace OpenAILib
     public static class CompletionModels
     {
         public const string TextDavinci0003 = "text-davinci-003";
-
-        [Obsolete("code-davinci:001,002 deprecated by OpenAI on March 23, 2023.")]
-        public const string CodeDavinci0002 = "code-davinci-002";
     }
 }

@@ -7,7 +7,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenAILib", "OpenAILib\Open
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenAILib.Tests", "OpenAILibTest\OpenAILib.Tests.csproj", "{4A2738BF-D805-49EB-836B-BF566809EB50}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenAILib.Sample", "OpenAILib.Sample\OpenAILib.Sample.csproj", "{E37507B5-37D5-440C-81AA-96450889171B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenAILib.Sample", "OpenAILib.Sample\OpenAILib.Sample.csproj", "{E37507B5-37D5-440C-81AA-96450889171B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AzureOpenAILib.Tests", "AzureOpenAILib.Tests\AzureOpenAILib.Tests.csproj", "{975535CA-7F45-422F-B281-F9A87D0218C7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -27,6 +29,10 @@ Global
 		{E37507B5-37D5-440C-81AA-96450889171B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E37507B5-37D5-440C-81AA-96450889171B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E37507B5-37D5-440C-81AA-96450889171B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{975535CA-7F45-422F-B281-F9A87D0218C7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{975535CA-7F45-422F-B281-F9A87D0218C7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{975535CA-7F45-422F-B281-F9A87D0218C7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{975535CA-7F45-422F-B281-F9A87D0218C7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

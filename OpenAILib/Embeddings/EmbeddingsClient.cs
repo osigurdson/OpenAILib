@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2023 Owen Sigurdson
 // MIT License
 
+using OpenAILib.HttpHandling;
 using OpenAILib.ResponseCaching;
 using System.Net.Http.Json;
 using System.Text.Json;
@@ -43,7 +44,7 @@ namespace OpenAILib.Embeddings
             var requestHash = RequestHashCalculator.CalculateHash(EndPointName, await content.ReadAsStringAsync());
             if (!_responseCache.TryGetResponseAsync(requestHash, out var responseText))
             {
-                var response = await _httpClient.PostAsync(EndPointName, content);
+                var response = await _httpClient.PostAsync(_httpClient.LazyUri(EndPointName), content);
                 response.EnsureSuccessStatusCode();
                 responseText = await response.Content.ReadAsStringAsync();
                 _responseCache.PutResponse(requestHash, responseText);

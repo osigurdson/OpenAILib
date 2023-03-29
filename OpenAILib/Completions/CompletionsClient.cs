@@ -1,9 +1,10 @@
 ﻿// Copyright (c) 2023 Owen Sigurdson
 // MIT License
 
-using OpenAILib.ResponseCaching;
 using System.Net.Http.Json;
 using System.Text.Json;
+using OpenAILib.HttpHandling;
+using OpenAILib.ResponseCaching;
 
 namespace OpenAILib.Completions
 {
@@ -26,7 +27,7 @@ namespace OpenAILib.Completions
             var requestHash = RequestHashCalculator.CalculateHash(CompletionsEndpointName, await content.ReadAsStringAsync());
             if (!_responseCache.TryGetResponseAsync(requestHash, out var responseText))
             {
-                var response = await _httpClient.PostAsync(CompletionsEndpointName, content);
+                var response = await this._httpClient.PostAsync(this._httpClient.LazyUri(CompletionsEndpointName), content);
                 response.EnsureSuccessStatusCode();
                 responseText = await response.Content.ReadAsStringAsync();
                 _responseCache.PutResponse(requestHash, responseText);

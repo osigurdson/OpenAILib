@@ -2,12 +2,26 @@
 
 Simple OpenAI completions and embeddings library with no dependencies. Includes ChatGPT completion sequences and simplified fine-tuning workflows.
 
-## Simple Example
+## Simple OpenAI Example
 
 ```csharp
 using OpenAILib;
 
 var client = new OpenAIClient(organizationId: "organizationId", apiKey: "apiKey");
+var result = await client.GetCompletionAsync("1 + 1 = "); // likely returns "2"
+```
+
+## Simple Azure OpenAI Example
+
+```csharp
+using OpenAILib;
+
+var client = new AzureOpenAIClient(new AzureOpenAIClientArgs(
+    apiKey: "apiKey",
+    resourceName: "resourceName", //from the url: <resourcename>.openai.azure.com
+    deploymentId: "model deployment name",
+    apiVersion: "api-version" //2022-12-01 for all, except for gpt-35-turbo which is 2023-03-15-preview
+    ));
 var result = await client.GetCompletionAsync("1 + 1 = "); // likely returns "2"
 ```
 

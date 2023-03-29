@@ -39,7 +39,7 @@ namespace OpenAILib.HttpHandling
             var stopwatch = Stopwatch.StartNew();
             while (stopwatch.Elapsed < TimeSpan.FromMinutes(2))
             {
-                var httpResponse = await httpClient.DeleteAsync(requestUri, cancellationToken);
+                var httpResponse = await httpClient.DeleteAsync(httpClient.LazyUri(requestUri), cancellationToken);
                 if (httpResponse.StatusCode != HttpStatusCode.Conflict)
                 {
                     return httpResponse;
@@ -62,7 +62,10 @@ namespace OpenAILib.HttpHandling
             CancellationToken cancellationToken = default)
         {
             var content = JsonContent.Create(request);
-            using var httpResponse = await httpClient.PostAsync(requestUri, content, cancellationToken);
+            using var httpResponse = await httpClient.PostAsync(
+                httpClient.LazyUri(requestUri),
+                content,
+                cancellationToken);
             httpResponse.EnsureSuccessStatusCode();
             var responseStream = await httpResponse.Content.ReadAsStreamAsync(cancellationToken);
             var response = Deserialize<TResponse>(responseStream, requestUri);
@@ -80,7 +83,7 @@ namespace OpenAILib.HttpHandling
             var requestHash = RequestHashCalculator.CalculateHash(requestUri, await content.ReadAsStringAsync());
             if (!responseCache.TryGetResponseAsync(requestHash, out var responseText))
             {
-                var response = await httpClient.PostAsync(requestUri, content, cancellationToken);
+                var response = await httpClient.PostAsync(httpClient.LazyUri(requestUri), content, cancellationToken);
                 response.EnsureSuccessStatusCode();
                 responseText = await response.Content.ReadAsStringAsync(cancellationToken);
                 responseCache.PutResponse(requestHash, responseText);

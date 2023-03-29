@@ -30,6 +30,9 @@
     <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
       <_Parameter1>$(AssemblyName).Tests</_Parameter1>
     </AssemblyAttribute>
+    <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
+	  <_Parameter1>Azure$(AssemblyName).Tests</_Parameter1>
+	</AssemblyAttribute>
   </ItemGroup>
 
 </Project>

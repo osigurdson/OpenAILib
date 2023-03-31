@@ -3,7 +3,6 @@
 
 using OpenAILib.Files;
 using OpenAILib.FineTuning;
-using OpenAILib.HttpHandling;
 using OpenAILib.Serialization;
 
 namespace OpenAILib.Tests.Files
@@ -14,12 +13,7 @@ namespace OpenAILib.Tests.Files
         [TestMethod]
         public async Task BasicUsageTest()
         {
-            var httpClient = OpenAIHttpClient
-                .CreateHttpClient(
-                    new OpenAIClientArgs(
-                        organizationId: TestCredentials.OrganizationId,
-                        apiKey: TestCredentials.ApiKey));
-
+            var httpClient = TestHttpClient.CreateHttpClient();
             var filesClient = new FilesClient(httpClient);
 
             // Get initial set of files

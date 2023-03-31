@@ -1,24 +1,27 @@
 ﻿
 using OpenAILib.HttpHandling;
-using OpenAILib.ResponseCaching;
 
 namespace OpenAILib.ChatCompletions
 {
     internal class ChatCompletionsClient
     {
-        private const string ChatCompletionsEndpointName = "chat/completions";
-        private readonly HttpClient _httpClient;
-        private readonly IResponseCache _responseCache;
+        private const string ChatCompletionsEndPointName = "chat/completions";
+        private readonly OpenAIHttpClient _httpClient;
 
-        public ChatCompletionsClient(HttpClient httpClient, IResponseCache responseCache)
+        public ChatCompletionsClient(OpenAIHttpClient httpClient)
         {
             _httpClient = httpClient;
-            this._responseCache = responseCache;
         }
 
-        public async Task<ChatCompletionResponse> CreateChatCompletionAsync(ChatCompletionRequest request)
+        public async Task<ChatCompletionResponse> CreateChatCompletionAsync(ChatCompletionRequest request, CancellationToken cancellationToken = default)
         {
-            return await _httpClient.OpenAIPostAsync<ChatCompletionRequest, ChatCompletionResponse>(ChatCompletionsEndpointName, request, _responseCache);
+            var (response, _) =  await _httpClient.PostAsync<ChatCompletionRequest, ChatCompletionResponse>(
+                originalRequestUri:  ChatCompletionsEndPointName, 
+                request: request, 
+                cacheResponses: true,
+                cancellationToken: cancellationToken);
+
+            return response;
         }
     }
 }

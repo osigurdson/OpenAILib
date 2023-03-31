@@ -21,7 +21,7 @@ namespace OpenAILib.Tests.FineTuning
             var filesClient = new FilesClient(httpClient);
             var fineTuneClient = new FineTunesLowLevelClient(httpClient);
             var modelsClient = new ModelsClient(httpClient);
-            var completionsClient = new CompletionsClient(httpClient, new NullResponseCache());
+            var completionsClient = new CompletionsClient(httpClient);
 
             // Create training fine tuning prompt / completion pairs
             var trainingData = TestCorpora.SquadOxygen.Create();

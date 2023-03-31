@@ -7,14 +7,13 @@ namespace OpenAILib.Tests
 {
     internal static class TestHttpClient
     {
-        public static HttpClient CreateHttpClient()
+        public static OpenAIHttpClient CreateHttpClient()
         {
-            var httpClient = OpenAIHttpClient
-                .CreateHttpClient(
-                    new OpenAIClientArgs(
+            var args = new OpenAIClientArgs(
                             organizationId: TestCredentials.OrganizationId,
-                            apiKey: TestCredentials.ApiKey));
+                            apiKey: TestCredentials.ApiKey);
 
+            var httpClient = new OpenAIHttpClient(args);
             return httpClient;
         }
     }

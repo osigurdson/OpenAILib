@@ -1,7 +1,6 @@
 ﻿// Copyright (c) 2023 Owen Sigurdson
 // MIT License
 
-using System.Text.Json;
 using OpenAILib.HttpHandling;
 
 namespace OpenAILib.Files
@@ -14,9 +13,9 @@ namespace OpenAILib.Files
     internal class FilesClient
     {
         private const string FilesEndPointName = "files";
-        private readonly HttpClient _httpClient;
+        private readonly OpenAIHttpClient _httpClient;
 
-        public FilesClient(HttpClient httpClient)
+        public FilesClient(OpenAIHttpClient httpClient)
         {
             _httpClient = httpClient;
         }
@@ -33,57 +32,40 @@ namespace OpenAILib.Files
                 { streamContent, "file", fileName }
             };
 
-            using var httpResponse = await _httpClient.PostAsync(FilesEndPointName, form, cancellationToken);
-            httpResponse.EnsureSuccessStatusCode();
-            using var responseStream = await httpResponse.Content.ReadAsStreamAsync(cancellationToken);
-            var deserializedResponse = JsonSerializer.Deserialize<FileResponse>(responseStream);
+            var response = await _httpClient.PostAsync<FileResponse>(
+                originalRequestUri: FilesEndPointName,
+                content: form,
+                cancellationToken: cancellationToken);
 
-            if (deserializedResponse?.Id == null)
-            {
-                throw new OpenAIException($"Failed to deserialize file upload response for file name '{fileName}', purpose '{purpose}'.");
-            }
-
-            return deserializedResponse.Id;
+            return response.Id;
         }
 
         public async Task<IReadOnlyList<FileResponse>> GetFilesAsync(CancellationToken cancellationToken = default)
         {
-            using var httpResponse = await _httpClient.GetAsync(FilesEndPointName, cancellationToken);
-            httpResponse.EnsureSuccessStatusCode();
-            using var responseStream = await httpResponse.Content.ReadAsStreamAsync(cancellationToken);
-            var deserilizedResponse = JsonSerializer.Deserialize<FileListResponse>(responseStream);
+            var response = await _httpClient.GetAsync<FileListResponse>(FilesEndPointName, cancellationToken);
 
-            if (deserilizedResponse?.Data == null)
+            if (response.Data == null)
             {
                 throw new OpenAIException($"Failed to deserialize file information response.");
             }
 
-            return deserilizedResponse.Data.ToList();
+            return response.Data.ToList();
         }
 
         public async Task<bool> DeleteAsync(string fileId, CancellationToken cancellationToken = default)
         {
-            return await _httpClient.OpenAIDeleteAsync($"{FilesEndPointName}/{fileId}", cancellationToken);
+            return await _httpClient.DeleteAsync($"{FilesEndPointName}/{fileId}", cancellationToken);
         }
 
         public async Task<FileResponse> GetFileInfoAsync(string fileId, CancellationToken cancellationToken = default)
         {
-            using var httpResponse = await _httpClient.GetAsync($"{FilesEndPointName}/{fileId}", cancellationToken);
-            httpResponse.EnsureSuccessStatusCode();
-            using var responseStream = await httpResponse.Content.ReadAsStreamAsync(cancellationToken);
-            var response = JsonSerializer.Deserialize<FileResponse>(responseStream);
-
-            if (response == null)
-            {
-                throw new OpenAIException($"Failed to deserialize file deletion response.");
-            }
-
+            var response = await _httpClient.GetAsync<FileResponse>($"{FilesEndPointName}/{fileId}", cancellationToken);
             return response;
         }
 
         public async Task<byte[]> GetFileContentAsync(string fileId, CancellationToken cancellationToken = default)
         {
-            using var httpResponse = await _httpClient.GetAsync($"{FilesEndPointName}/{fileId}/content", cancellationToken);
+            using var httpResponse = await _httpClient.GetHttpResponseAsync($"{FilesEndPointName}/{fileId}/content", cancellationToken);
             httpResponse.EnsureSuccessStatusCode();
             return await httpResponse.Content.ReadAsByteArrayAsync(cancellationToken);
         }

@@ -11,7 +11,6 @@ namespace OpenAILib
 {
     public class OpenAIClient
     {
-        private readonly HttpClient _httpClient;
         private readonly EmbeddingsClient _embeddingsClient;
         private readonly ChatCompletionsClient _chatCompletionsClient;
         private readonly CompletionsClient _completionsClient;
@@ -33,11 +32,11 @@ namespace OpenAILib
 
         public OpenAIClient(OpenAIClientArgs args)
         {
-            _httpClient = OpenAIHttpClient.CreateHttpClient(args);
-            _embeddingsClient = new EmbeddingsClient(_httpClient, args.ResponseCache);
-            _completionsClient = new CompletionsClient(_httpClient, args.ResponseCache);
-            _chatCompletionsClient = new ChatCompletionsClient(_httpClient, args.ResponseCache);
-            _fineTuningClient = new FineTunesClient(_httpClient);
+            var httpClient = new OpenAIHttpClient(args);
+            _embeddingsClient = new EmbeddingsClient(httpClient);
+            _completionsClient = new CompletionsClient(httpClient);
+            _chatCompletionsClient = new ChatCompletionsClient(httpClient);
+            _fineTuningClient = new FineTunesClient(httpClient);
         }
 
         /// <summary>

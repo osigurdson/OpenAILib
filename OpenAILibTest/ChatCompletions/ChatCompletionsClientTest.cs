@@ -2,7 +2,6 @@
 // MIT License
 
 using OpenAILib.ChatCompletions;
-using OpenAILib.ResponseCaching;
 
 namespace OpenAILib.Tests.ChatCompletions
 {
@@ -13,7 +12,7 @@ namespace OpenAILib.Tests.ChatCompletions
         public async Task TestCreateChatCompletionAsync()
         {
             var httpClient = TestHttpClient.CreateHttpClient();
-            var chatClient = new ChatCompletionsClient(httpClient, new NullResponseCache());
+            var chatClient = new ChatCompletionsClient(httpClient);
 
             // example as discussed in the open ai API documentation
             var chatRequest = new ChatCompletionRequest("gpt-3.5-turbo", new List<ChatMessageRequest>

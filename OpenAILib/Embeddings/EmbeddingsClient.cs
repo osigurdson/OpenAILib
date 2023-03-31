@@ -1,22 +1,18 @@
 ﻿// Copyright (c) 2023 Owen Sigurdson
 // MIT License
 
-using OpenAILib.ResponseCaching;
-using System.Net.Http.Json;
-using System.Text.Json;
+using OpenAILib.HttpHandling;
 
 namespace OpenAILib.Embeddings
 {
     internal class EmbeddingsClient
     {
-        private const string EndPointName = "embeddings";
-        private readonly HttpClient _httpClient;
-        private readonly IResponseCache _responseCache;
+        private const string EmbeddingsEndpointName = "embeddings";
+        private readonly OpenAIHttpClient _httpClient;
 
-        public EmbeddingsClient(HttpClient httpClient, IResponseCache responseCache)
+        public EmbeddingsClient(OpenAIHttpClient httpClient)
         {
             _httpClient = httpClient;
-            _responseCache = responseCache;
         }
 
         /// <summary>
@@ -29,7 +25,7 @@ namespace OpenAILib.Embeddings
         /// As a result, the embedding vectors returned by this method may also change. 
         /// If you require consistent embeddings across different versions of the library, you should specify a model explicitly.
         /// </remarks>
-        public async Task<double[]> GetEmbeddingAsync(string text)
+        public async Task<double[]> GetEmbeddingAsync(string text, CancellationToken cancellationToken = default)
         {
             const string originalModel = "text-embedding-ada-002";
             var request = new EmbeddingRequest
@@ -38,27 +34,13 @@ namespace OpenAILib.Embeddings
                 Input = text
             };
 
-            var content = JsonContent.Create(request);
-
-            var requestHash = RequestHashCalculator.CalculateHash(EndPointName, await content.ReadAsStringAsync());
-            if (!_responseCache.TryGetResponseAsync(requestHash, out var responseText))
-            {
-                var response = await _httpClient.PostAsync(EndPointName, content);
-                response.EnsureSuccessStatusCode();
-                responseText = await response.Content.ReadAsStringAsync();
-                _responseCache.PutResponse(requestHash, responseText);
-            }
-
-            if (string.IsNullOrEmpty(responseText))
-            {
-                throw new ArgumentException($"No result returned for embedding text: '{text}'");
-            }
-
-            var embeddingResponse = JsonSerializer.Deserialize<EmbeddingResponse>(responseText);
+            var (embeddingResponse, responseText) = await _httpClient.PostAsync<EmbeddingRequest, EmbeddingResponse>(
+                originalRequestUri: EmbeddingsEndpointName, 
+                request: request, 
+                cacheResponses: true, 
+                cancellationToken: cancellationToken);
             
-            if (embeddingResponse == null ||
-                embeddingResponse.Data == null || 
-                embeddingResponse.Data.Count != 1)
+            if (embeddingResponse.Data == null ||  embeddingResponse.Data.Count != 1)
             {
                 throw new OpenAIException($"Failed to deserialize embedding response '{responseText}'.");
             }

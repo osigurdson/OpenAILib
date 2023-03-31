@@ -2,37 +2,28 @@
 // MIT License
 
 using OpenAILib.HttpHandling;
-using System.Text.Json;
 
 namespace OpenAILib.Models
 {
-
     internal class ModelsClient
     {
-        private const string ModelsEndpointName = "models";
-        private readonly HttpClient _httpClient;
+        private const string ModelsEndPointName = "models";
+        private readonly OpenAIHttpClient _httpClient;
 
-        public ModelsClient(HttpClient httpClient)
+        public ModelsClient(OpenAIHttpClient httpClient)
         {
             _httpClient = httpClient;
         }
 
         public async Task<List<ModelResponse>> GetModelsAsync(CancellationToken cancellationToken = default)
         {
-            var httpResponse = await _httpClient.GetAsync(ModelsEndpointName, cancellationToken);
-            httpResponse.EnsureSuccessStatusCode();
-            var responseStream = await httpResponse.Content.ReadAsStreamAsync();
-            var response = JsonSerializer.Deserialize<ModelListResponse>(responseStream);
-            if (response == null)
-            {
-                throw new OpenAIException("Failed to deserialize model responses");
-            }
+            var response = await _httpClient.GetAsync<ModelListResponse>(ModelsEndPointName, cancellationToken);
             return response.Data;
         }
 
-        public async Task<bool> DeleteAsync(string model)
+        public async Task<bool> DeleteAsync(string model, CancellationToken cancellationToken = default)
         {
-            return await _httpClient.OpenAIDeleteAsync($"{ModelsEndpointName}/{model}");
+            return await _httpClient.DeleteAsync($"{ModelsEndPointName}/{model}", cancellationToken);
         }
     }
 }

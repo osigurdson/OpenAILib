@@ -1,7 +1,6 @@
 ﻿// Copyright (c) 2023 Owen Sigurdson
 // MIT License
 
-using System.Net.Http.Json;
 using System.Runtime.CompilerServices;
 using System.Text.Json;
 using System.Threading.Channels;
@@ -13,52 +12,39 @@ namespace OpenAILib.FineTuning
     {
         private const string FineTunesEndpointName = "fine-tunes";
 
-        private readonly HttpClient _httpClient;
+        private readonly OpenAIHttpClient _httpClient;
 
-        public FineTunesLowLevelClient(HttpClient httpClient)
+        public FineTunesLowLevelClient(OpenAIHttpClient httpClient)
         {
             _httpClient = httpClient;
         }
 
         public async Task<string> CreateFineTuneAsync(FineTuneRequest request, CancellationToken cancellationToken = default)
         {
-            var content = JsonContent.Create(request);
-            var httpResponse = await _httpClient.PostAsync(FineTunesEndpointName, content, cancellationToken);
-            httpResponse.EnsureSuccessStatusCode();
-            var responseStream = await httpResponse.Content.ReadAsStreamAsync(cancellationToken);
-            var response = JsonSerializer.Deserialize<FineTuneResponse>(responseStream);
-
-            if (response == null || response.Id == null)
-            {
-                throw new OpenAIException("Failed to deserialize fine tune response");
-            }
+            var (response, _) = await _httpClient.PostAsync<FineTuneRequest, FineTuneResponse>(
+                originalRequestUri: FineTunesEndpointName,
+                request: request,
+                cacheResponses: false,
+                cancellationToken: cancellationToken);
 
             return response.Id;
         }
 
         public async Task<IReadOnlyList<FineTuneResponse>> GetFineTunesAsync(CancellationToken cancellationToken = default)
         {
-            var httpResponse = await _httpClient.GetAsync(FineTunesEndpointName, cancellationToken);
-            httpResponse.EnsureSuccessStatusCode();
-            var responseStream = await httpResponse.Content.ReadAsStreamAsync(cancellationToken);
-            var response = JsonSerializer.Deserialize<FineTuneListResponse>(responseStream);
-            if (response == null || response.Data == null)
-            {
+            var response = await _httpClient.GetAsync<FineTuneListResponse>(
+                originalRequestUri: FineTunesEndpointName,
+                cancellationToken: cancellationToken);
 
-                throw new OpenAIException("Failed to deserialize fine tune responses ");
-            }
             return response.Data;
         }
 
         public async Task<FineTuneResponse> GetFineTuneAsync(string fineTuneId, CancellationToken cancellationToken = default)
         {
-            var httpResponse = await _httpClient.GetAsync($"{FineTunesEndpointName}/{fineTuneId}", cancellationToken);
-            httpResponse.EnsureSuccessStatusCode();
-            var response = await httpResponse.Content.ReadFromJsonAsync<FineTuneResponse>();
-            if (response == null)
-            {
-                throw new OpenAIException($"Failed to deserialize fine tune '{fineTuneId}'.");
-            }
+            var response = await _httpClient.GetAsync<FineTuneResponse>(
+                originalRequestUri: $"{FineTunesEndpointName}/{fineTuneId}",
+                cancellationToken: cancellationToken);
+
             return response;
         }
 
@@ -68,8 +54,14 @@ namespace OpenAILib.FineTuning
             // this reason, a hashset of all previously observed events is maintained so consumers do not have to deal
             // with filtering events manually
             var existingMessages = new HashSet<string>();
-            var url = $"{FineTunesEndpointName}/{fineTuneId}/events?stream=true";
-            await using var sseProcessor = new ServerSentEventsSubscriber(_httpClient, url, cancellationToken);
+
+            // The server sent events subscriber requires a string based url and access to the underlying HttpClient
+            // The uri is manually tranformed for this reason
+            var originalRequestUri = $"{FineTunesEndpointName}/{fineTuneId}/events?stream=true";
+            var transformedUri = _httpClient.GetTransformedUri(originalRequestUri).ToString();
+            var rawHttpClient = _httpClient.GetHttpClient();
+
+            await using var sseProcessor = new ServerSentEventsSubscriber(rawHttpClient, transformedUri, cancellationToken);
             var channel = Channel.CreateUnbounded<FineTuneEventResponse>();
             sseProcessor.NewPayloadMessage += (_, ssePayloadText) =>
             {

@@ -2,6 +2,7 @@
 // MIT License
 
 using OpenAILib.Files;
+using OpenAILib.HttpHandling;
 using OpenAILib.Models;
 using OpenAILib.Serialization;
 using System.Collections.Concurrent;
@@ -18,7 +19,7 @@ namespace OpenAILib.FineTuning
         private readonly ModelsClient _modelsClient;
         private static readonly ConcurrentDictionary<string, string> s_fineTuneIdToModelNameMap = new ConcurrentDictionary<string, string>();
 
-        public FineTunesClient(HttpClient httpClient)
+        public FineTunesClient(OpenAIHttpClient httpClient)
         {
             _fineTunesClient = new FineTunesLowLevelClient(httpClient);
             _filesClient = new FilesClient(httpClient);

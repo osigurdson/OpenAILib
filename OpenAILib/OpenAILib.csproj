@@ -6,17 +6,18 @@
     <Nullable>enable</Nullable>
 
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <RepositoryUrl>https://github.com/osigurdson/OpenAILib</RepositoryUrl>
+    <RepositoryUrl>https://github.com/jimgaleforce/openailib</RepositoryUrl>
     <IncludeSymbols>true</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-    <Version>2.0.0</Version>
+    <Version>2.0.1</Version>
     <Description>Simple OpenAI completions and embeddings library with no dependencies. Supports ChatGPT versions 3.5 and 4. Streamlines fine-tuning workflows.</Description>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <Title>OpenAILib</Title>
-    <PackageProjectUrl>https://github.com/osigurdson/OpenAILib</PackageProjectUrl>
+    <PackageProjectUrl>https://github.com/jimgaleforce/openailib</PackageProjectUrl>
     <Copyright>Copyright (c) Owen Sigurdson</Copyright>
     <PackageTags>OpenAI;Library;Embeddings;Completions;Simple;ChatGPT;ChatGPT4; Fine-tuning; Dependency free</PackageTags>
     <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageReleaseNotes>allows Embedding client to be public with optional model name</PackageReleaseNotes>
   </PropertyGroup>
 
   <ItemGroup>

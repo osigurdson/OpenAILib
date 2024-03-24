@@ -8,7 +8,7 @@ using System.Text.Json;
 
 namespace OpenAILib.Embeddings
 {
-    internal class EmbeddingsClient
+    public class EmbeddingsClient
     {
         private const string EndPointName = "embeddings";
         private readonly HttpClient _httpClient;
@@ -21,21 +21,25 @@ namespace OpenAILib.Embeddings
         }
 
         /// <summary>
-        /// Retrieves an embedding vector for the specified text using the recommended default model ('text-embedding-ada-002').
+        /// Retrieves an embedding vector for the specified text using the recommended default model
+        /// ('text-embedding-ada-002').
         /// </summary>
         /// <param name="text">The input text for which to obtain an embedding vector.</param>
-        /// <returns>A <see cref="Task{TResult}"/> representing the asynchronous operation. The task result contains the associated embedding vector as a double array.</returns>
+        /// <returns>
+        /// A <see cref="Task{TResult}"/> representing the asynchronous operation. The task result
+        /// contains the associated embedding vector as a double array.
+        /// </returns>
         /// <remarks>
-        /// The default model used by this method may change in future versions of the library. 
-        /// As a result, the embedding vectors returned by this method may also change. 
-        /// If you require consistent embeddings across different versions of the library, you should specify a model explicitly.
+        /// The default model used by this method may change in future versions of the library.  As
+        /// a result, the embedding vectors returned by this method may also change.  If you require
+        /// consistent embeddings across different versions of the library, you should specify a
+        /// model explicitly.
         /// </remarks>
-        public async Task<double[]> GetEmbeddingAsync(string text)
+        public async Task<double[]> GetEmbeddingAsync(string text, string model = "text-embedding-ada-002")
         {
-            const string originalModel = "text-embedding-ada-002";
             var request = new EmbeddingRequest
             {
-                Model = originalModel,
+                Model = model,
                 Input = text
             };
 
@@ -56,10 +60,8 @@ namespace OpenAILib.Embeddings
             }
 
             var embeddingResponse = JsonSerializer.Deserialize<EmbeddingResponse>(responseText);
-            
-            if (embeddingResponse == null ||
-                embeddingResponse.Data == null || 
-                embeddingResponse.Data.Count != 1)
+
+            if (embeddingResponse == null || embeddingResponse.Data == null || embeddingResponse.Data.Count != 1)
             {
                 throw new OpenAIException($"Failed to deserialize embedding response '{responseText}'.");
             }
